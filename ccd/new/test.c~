@@ -1,0 +1,53 @@
+#include <fcntl.h>
+#include <ctype.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/time.h>
+#include <signal.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
+#include <linux/videodev2.h>
+#include <linux/fb.h>
+
+
+int main(){
+/*----------------------------------------------------------
+//config MFC H.264 encoder.
+------------------------------------------------------------*/
+
+  int   mfc_fd, outyuv_fd;
+  char  *addr_mfc, *in_addr;
+  int   cnt = 0;
+  int   frame_count;
+  int   frame_size;
+  char  *in_buf_mfc, *out_buf_mfc;
+  
+
+ //打开MFC 设备
+ mfc_fd = open("/dev/s3c-mfc", O_RDWR|O_NDELAY);///dev/s3c-mfc   O_RDWR|O_NDELAY 
+ if(mfc_fd<0)
+  {
+   printf("MFC open error : %d\n", mfc_fd);
+   return -1;
+  }
+ //mmap MFC: mapping shared in/out buffer between App and D/D
+ addr_mfc = (char *) mmap(0, 
+   1, 
+   PROT_READ | PROT_WRITE,
+   MAP_SHARED,
+   -1,
+   0
+   );
+ if (addr_mfc == NULL) {
+  printf("MFC mmap failed\n");
+  return -1;
+ }
+  printf("addr : %d\n", addr_mfc);
+ 
+ return 0;
+}
