@@ -129,6 +129,33 @@ public:
 		if (fd < 0) {
 			throw TError("cannot open frame buffer");
 		}
+		//测试支持的分辨率
+			 enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		struct v4l2_fmtdesc fmt;
+		struct v4l2_frmsizeenum frmsize;
+		struct v4l2_frmivalenum frmival;
+
+		fmt.index = 0;
+		fmt.type = type;
+		while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
+			frmsize.pixel_format = fmt.pixelformat;
+			frmsize.index = 0;
+			while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0) {
+				if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+					printf("%dx%d\n", 
+									  frmsize.discrete.width,
+									  frmsize.discrete.height);
+				} else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
+					printf("%dx%d\n", 
+									  frmsize.stepwise.max_width,
+									  frmsize.stepwise.max_height);
+				}
+					frmsize.index++;
+				}
+				fmt.index++;
+		}
+	//
+	
 
         struct fb_fix_screeninfo Fix;
         struct fb_var_screeninfo Var;
@@ -348,7 +375,7 @@ void TVideo::OpenDevice()
 
     memset(&m_events_c, 0, sizeof(m_events_c));
     m_events_c.fd = fd;
-    m_events_c.events = POLLIN | POLLERR;
+    m_events_c.events = POLLIN | POLLERR;  //监听 读 和 异常事件
     
 	return;
 }
@@ -394,14 +421,19 @@ void TVideo::StopStream()
 }
 
 bool TVideo::WaitPic()
-{
-    int ret = poll(&m_events_c,  1, 10000);
+{//int poll(struct pollfd fds[], nfds_t nfds, int timeout)；
+//参数说明:
+//fds：是一个struct pollfd结构类型的数组，用于存放需要检测其状态的Socket描述符；每当调用这个函数之后，系统不会清空这个数组，操作起来比较方便；特别是对于 socket连接比较多的情况下，在一定程度上可以提高处理的效率；这一点与select()函数不同，调用select()函数之后，select() 函数会清空它所检测的socket描述符集合，导致每次调用select()之前都必须把socket描述符重新加入到待检测的集合中；因 此，select()函数适合于只检测一个socket描述符的情况，而poll()函数适合于大量socket描述符的情况；
+//nfds：nfds_t类型的参数，用于标记数组fds中的结构体元素的总数量；
+//timeout：是poll函数调用阻塞的时间，单位：毫秒；
+
+    int ret = poll(&m_events_c,  1, 10000);  //成功时，poll()返回结构体中revents域不为0的文件描述符个数；如果在超时前没有任何事件发生，poll()返回0；失败时，poll()返回-1，并设置errno为下列值之一：
     if (ret > 0) {
         return true;
     }
     return false;
 }
-
+//yuv转rgb
 static void decodeYUV420SP(unsigned int* rgbBuf, unsigned char* yuv420sp, int width, int height) {  
     int frameSize = width * height;  
 
@@ -482,6 +514,7 @@ int main(int argc, char **argv)
 	try {
 		TFrameBuffer FrameBuffer;
 		TVideo Video;
+		
         while(Video.IsValid()) {
             if (Video.WaitPic()) {
                 if (Video.FetchPicture()) {
