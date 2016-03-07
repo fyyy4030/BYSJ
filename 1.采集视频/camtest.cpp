@@ -42,8 +42,8 @@ public:
 	}
 	virtual ~TRect() {
 	}
-	bool DrawRect(const TRect bitand SrcRect, int x, int y) const {
-		if (BPP not_eq 32 or SrcRect.BPP not_eq 32) {
+	bool DrawRect(const TRect bitand SrcRect, int x, int y) const { //bitand 相当于 & 传的实参
+		if (BPP not_eq 32 or SrcRect.BPP not_eq 32) {//　在前面的设置过程中可以设置X服务器使用多种色彩深度，如8bpp、 16bpp、24bpp和32bpp，一般来讲色彩深度越大，所能表现的色彩越丰富，而 24bpp就被称为真彩色，能真实的表现图象的色彩（32bpp实际也只是24bpp， 它是为了让每个象素都占据独立的32位双字，以对齐象素边界，加速处理速度） 
 			// don't support that yet
 			throw TError("does not support other than 32 BPP yet");
 		}
@@ -84,8 +84,8 @@ public:
 		unsigned char *DstPtr = Addr + LineLen * y0 + x0 * BPP / 8;
 		const unsigned char *SrcPtr = SrcRect.Addr + SrcRect.LineLen *(y0 - y) + (x0 - x) * SrcRect.BPP / 8;
 
-		for (int i = y0; i <= y1; i++) {
-			memcpy(DstPtr, SrcPtr, copyLineLen);
+		for (int i = y0; i <= y1; i++) {//FrameByffer的Addr就是屏幕的映射地址
+			memcpy(DstPtr, SrcPtr, copyLineLen); //memcpy函数的功能是从源src所指的内存地址的起始位置开始拷贝n个字节到目标dest所指的内存地址的起始位置中。
 			DstPtr += LineLen;
 			SrcPtr += SrcRect.LineLen;
 		}
@@ -95,7 +95,7 @@ public:
 	}
 
 	bool DrawRect(const TRect bitand rect) const { // default is Center
-		return DrawRect(rect, (Width - rect.Width) / 2, (Height - rect.Height) / 2);
+		return DrawRect(rect, (Width - rect.Width) / 2, (Height - rect.Height) / 2);//计算一下中心
 	}
 
 	bool Clear() const {
@@ -122,39 +122,13 @@ protected:
 
 class TFrameBuffer: public TRect {
 public:
-	TFrameBuffer(const char *DeviceName = "/dev/fb0"): TRect(), fd(-1) {
+	TFrameBuffer(const char *DeviceName = "/dev/fb0"): TRect(), fd(-1) {// 我们对屏幕的读写就可以转换成对/dev/fb0,这里是对屏幕的操作，
 		Addr = (unsigned char *)MAP_FAILED;
 
         fd = open(DeviceName, O_RDWR);
 		if (fd < 0) {
 			throw TError("cannot open frame buffer");
 		}
-		//测试支持的分辨率
-			 enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-		struct v4l2_fmtdesc fmt;
-		struct v4l2_frmsizeenum frmsize;
-		struct v4l2_frmivalenum frmival;
-
-		fmt.index = 0;
-		fmt.type = type;
-		while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
-			frmsize.pixel_format = fmt.pixelformat;
-			frmsize.index = 0;
-			while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0) {
-				if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
-					printf("%dx%d\n", 
-									  frmsize.discrete.width,
-									  frmsize.discrete.height);
-				} else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
-					printf("%dx%d\n", 
-									  frmsize.stepwise.max_width,
-									  frmsize.stepwise.max_height);
-				}
-					frmsize.index++;
-				}
-				fmt.index++;
-		}
-	//
 	
 
         struct fb_fix_screeninfo Fix;
@@ -173,10 +147,10 @@ public:
         	LineLen = Fix.line_length;
       		Size = LineLen * Height;
 
-		int PageSize = getpagesize();
+		int PageSize = getpagesize();    //使用getpagesize函数获得一页内存大小
 		Size = (Size + PageSize - 1) / PageSize * PageSize ;
-	        Addr = (unsigned char *)mmap(NULL, Size, PROT_READ|PROT_WRITE,MAP_SHARED, fd, 0);
-		if (Addr == (unsigned char *)MAP_FAILED) {
+	        Addr = (unsigned char *)mmap(NULL, Size, PROT_READ|PROT_WRITE,MAP_SHARED, fd, 0);//映射屏幕操作地址
+		if (Addr == (unsigned char *)MAP_FAILED) {//如果毫无变化当然就是失败了
 			throw TError("map frame buffer failed");
 			return;
 		}
@@ -262,6 +236,36 @@ void TVideo::OpenDevice()
 		fprintf(stderr, "cannot query capability\n");
 		return;
 	}
+	fprintf(stderr, "start test\n");
+			//测试支持的分辨率,这个摄像头好像并不能输出他们
+		enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		struct v4l2_fmtdesc fmt2;
+		struct v4l2_frmsizeenum frmsize;
+		struct v4l2_frmivalenum frmival;
+		
+		fmt2.index = 0;
+		fmt2.type = type;
+		if(::ioctl(fd, VIDIOC_ENUM_FMT, &fmt2) < 0){
+			fprintf(stderr, "enum < 0\n");
+		}
+		while (::ioctl(fd, VIDIOC_ENUM_FMT, &fmt2) >= 0) {
+			frmsize.pixel_format = fmt2.pixelformat;
+			frmsize.index = 0;
+			while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0) {
+				if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+					printf("%dx%d\n", 
+									  frmsize.discrete.width,
+									  frmsize.discrete.height);
+				} else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
+					printf("%dx%d\n", 
+									  frmsize.stepwise.max_width,
+									  frmsize.stepwise.max_height);
+				}
+					frmsize.index++;
+				}
+				fmt2.index++;
+		}
+	//
 
 	if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
         Valid = false;
@@ -356,7 +360,7 @@ void TVideo::OpenDevice()
     		fprintf(stderr, "unable to map capture buffer\n");
     		return;
     	}
-        
+        //直接从这里输出的图片看一看长什么样子，每次执行指挥输出一次ImageSize.
         fprintf(stderr, "ImageSize[%d] = %ld\n", i, b.length);
     }
 
@@ -477,7 +481,7 @@ static void decodeYUV420SP(unsigned int* rgbBuf, unsigned char* yuv420sp, int wi
 
 bool TVideo::FetchPicture()
 {
-	struct v4l2_buffer b;
+	struct v4l2_buffer b;//b 里面存放
 	memset(&b, 0, sizeof b);
 	b.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	b.memory = V4L2_MEMORY_MMAP;
@@ -488,15 +492,15 @@ bool TVideo::FetchPicture()
 	}
 
     
-    void *data_ = captureBuffer[b.index].data;
+    void *data_ = captureBuffer[b.index].data; //captuerBuffer只有两个，也就是说一个主，一个副，轮流切换，frameBuffer用？从现在代码的用处看应该还没到
     unsigned int len = b.bytesused;
     unsigned int index = b.index;
     //wo zi ji shi yi fa
     FILE *file_fd;//yeshiwoxiede 
     file_fd = fopen("test-mmap.yuv", "w");//图片文件名
-    unsigned char* data = (unsigned char*) data_;
-    decodeYUV420SP((unsigned int*)Addr, data, Width, Height);
-    fwrite(data, Width*Height, 1, file_fd); //将其写入文件中
+    unsigned char* data = (unsigned char*) data_; //看起来应该是把原始数据放到了data里面
+	fwrite(data, Width*Height, 1, file_fd); //将其写入文件中,在转码之前写进去
+    decodeYUV420SP((unsigned int*)Addr, data, Width, Height);//在这里转换了 
     fclose(file_fd);//wo xie de 
     fprintf(stderr, "save yuyv file ok\n");
 
@@ -515,10 +519,10 @@ int main(int argc, char **argv)
 		TFrameBuffer FrameBuffer;
 		TVideo Video;
 		
-        while(Video.IsValid()) {
-            if (Video.WaitPic()) {
-                if (Video.FetchPicture()) {
-                    FrameBuffer.DrawRect(Video);
+        while(Video.IsValid()) {//如果可用，进入循环
+            if (Video.WaitPic()) {//等待取图片
+                if (Video.FetchPicture()) {//如果取到
+                    FrameBuffer.DrawRect(Video);//显示在单片机上
                 }
             }
         }
