@@ -74,8 +74,8 @@ int main()
 #else
     param->codecType = MPEG4_ENC;
 #endif
-    param->SourceWidth = 352;
-    param->SourceHeight = 288;
+    param->SourceWidth = 640;
+    param->SourceHeight = 480;
     param->IDRPeriod = 100;
     param->SliceMode = 0; // 0,1,2,4
     param->RandomIntraMBRefresh = 0;
@@ -97,7 +97,7 @@ int main()
     param->ProfileIDC = 1; // 0=main,1=high,2=baseline
     param->LevelIDC = 40; // level 4.0
     param->FrameQp_B = 20;
-    param->FrameRate = 30000; // real frame rate = FrameRate/1000 (refer to S5PV210 datasheet Section 6.3.4.2.2)
+    param->FrameRate = 5000; // real frame rate = FrameRate/1000 (refer to S5PV210 datasheet Section 6.3.4.2.2)
     param->SliceArgument = 0;
     param->NumberBFrames = 0; //<=2
     param->NumberReferenceFrames = 2; // <=2
