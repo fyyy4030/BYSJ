@@ -497,9 +497,9 @@ bool TVideo::FetchPicture()
     unsigned int index = b.index;
     //wo zi ji shi yi fa
     FILE *file_fd;//yeshiwoxiede 
-    file_fd = fopen("test-mmap.yuv", "w");//图片文件名
+    file_fd = fopen("test-mmap.yuv", "a+");//图片文件名
     unsigned char* data = (unsigned char*) data_; //看起来应该是把原始数据放到了data里面
-	fwrite(data, Width*Height, 1, file_fd); //将其写入文件中,在转码之前写进去
+	fwrite(data, Width*Height*3/2, 1, file_fd); //将其写入文件中,在转码之前写进去
     decodeYUV420SP((unsigned int*)Addr, data, Width, Height);//在这里转换了 
     fclose(file_fd);//wo xie de 
     fprintf(stderr, "save yuyv file ok\n");
