@@ -25,8 +25,8 @@ typedef struct
 } NALU_t;  
   
 FILE *bits = NULL;                //!< the bit stream file  
-static int FindStartCode2 (unsigned char *Buf);//²éÕÒ¿ªÊ¼×Ö·û0x000001  
-static int FindStartCode3 (unsigned char *Buf);//²éÕÒ¿ªÊ¼×Ö·û0x00000001  
+static int FindStartCode2 (unsigned char *Buf);//ï¿½ï¿½ï¿½Ò¿ï¿½Ê¼ï¿½Ö·ï¿½0x000001  
+static int FindStartCode3 (unsigned char *Buf);//ï¿½ï¿½ï¿½Ò¿ï¿½Ê¼ï¿½Ö·ï¿½0x00000001  
 //static bool flag = true;  
 static int info2=0, info3=0;  
 RTP_FIXED_HEADER        *rtp_hdr;  
@@ -47,7 +47,7 @@ FU_HEADER       *fu_hdr;
     WORD VersionRequested; 
     WSADATA WsaData; 
     VersionRequested=MAKEWORD(2,2); 
-    Error=WSAStartup(VersionRequested,&WsaData); //Æô¶¯WinSock2 
+    Error=WSAStartup(VersionRequested,&WsaData); //ï¿½ï¿½ï¿½ï¿½WinSock2 
     if(Error!=0) 
     { 
         return FALSE; 
@@ -64,7 +64,7 @@ FU_HEADER       *fu_hdr;
     return TRUE; 
 }*/  
   
-//ÎªNALU_t½á¹¹Ìå·ÖÅäÄÚ´æ¿Õ¼ä  
+//ÎªNALU_tï¿½á¹¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½Õ¼ï¿½  
 NALU_t *AllocNALU(int buffersize)  
 {  
   NALU_t *n;  
@@ -86,7 +86,7 @@ NALU_t *AllocNALU(int buffersize)
   
   return n;  
 }  
-//ÊÍ·Å  
+//ï¿½Í·ï¿½  
 void FreeNALU(NALU_t *n)  
 {  
   if (n)  
@@ -108,8 +108,8 @@ void OpenBitstreamFile (char *fn)
       exit(0);  
   }  
 }  
-//Õâ¸öº¯ÊýÊäÈëÎªÒ»¸öNAL½á¹¹Ìå£¬Ö÷Òª¹¦ÄÜÎªµÃµ½Ò»¸öÍêÕûµÄNALU²¢±£´æÔÚNALU_tµÄbufÖÐ£¬»ñÈ¡ËûµÄ³¤¶È£¬Ìî³äF,IDC,TYPEÎ»¡£  
-//²¢ÇÒ·µ»ØÁ½¸ö¿ªÊ¼×Ö·ûÖ®¼ä¼ä¸ôµÄ×Ö½ÚÊý£¬¼´°üº¬ÓÐÇ°×ºµÄNALUµÄ³¤¶È  
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªÒ»ï¿½ï¿½NALï¿½á¹¹ï¿½å£¬ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Îªï¿½Ãµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½NALUï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½NALU_tï¿½ï¿½bufï¿½Ð£ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ä³ï¿½ï¿½È£ï¿½ï¿½ï¿½ï¿½ï¿½F,IDC,TYPEÎ»ï¿½ï¿½  
+//ï¿½ï¿½ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½Ö·ï¿½Ö®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°×ºï¿½ï¿½NALUï¿½Ä³ï¿½ï¿½ï¿½  
 int GetAnnexbNALU (NALU_t *nalu,SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)  
 {  
   int pos = 0;  
@@ -119,28 +119,28 @@ int GetAnnexbNALU (NALU_t *nalu,SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
   if ((Buf = (unsigned char*)calloc (nalu->max_size , sizeof(char))) == NULL)   
       printf ("GetAnnexbNALU: Could not allocate Buf memory\n");  
   
-  nalu->startcodeprefix_len=3;//³õÊ¼»¯ÂëÁ÷ÐòÁÐµÄ¿ªÊ¼×Ö·ûÎª3¸ö×Ö½Ú  
+  nalu->startcodeprefix_len=3;//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ¿ï¿½Ê¼ï¿½Ö·ï¿½Îª3ï¿½ï¿½ï¿½Ö½ï¿½  
     
-   memcpy (Buf,h264Buf + cursor,3);//´ÓÂëÁ÷ÖÐ¶Á3¸ö×Ö½Ú  .fwrite(oinfo.StrmVirAddr,1,oinfo.dataSize,fp_strm);
+   memcpy (Buf,h264Buf + cursor,3);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½3ï¿½ï¿½ï¿½Ö½ï¿½  .fwrite(oinfo.StrmVirAddr,1,oinfo.dataSize,fp_strm);
 //   printf ("BUF: %c%c%c\n",Buf[0],Buf[1],Buf[2]);  
    cursor+=3;
-   info2 = FindStartCode2 (Buf);//ÅÐ¶ÏÊÇ·ñÎª0x000001   
+   info2 = FindStartCode2 (Buf);//ï¿½Ð¶ï¿½ï¿½Ç·ï¿½Îª0x000001   
    if(info2 != 1)   
    {  
-    //Èç¹û²»ÊÇ£¬ÔÙ¶ÁÒ»¸ö×Ö½Ú  
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç£ï¿½ï¿½Ù¶ï¿½Ò»ï¿½ï¿½ï¿½Ö½ï¿½  
 	memcpy(Buf+3,h264Buf + cursor,1);
-//	printf ("ÔÚ¶ÁÒ»¸ö×Ö½ÚBUF: %c%c%c%c\n",Buf[0],Buf[1],Buf[2],Buf[3]);  
+//	printf ("ï¿½Ú¶ï¿½Ò»ï¿½ï¿½ï¿½Ö½ï¿½BUF: %c%c%c%c\n",Buf[0],Buf[1],Buf[2],Buf[3]);  
 	cursor++;
-    info3 = FindStartCode3 (Buf);//ÅÐ¶ÏÊÇ·ñÎª0x00000001  
-    if (info3 != 1)//Èç¹û²»ÊÇ£¬·µ»Ø-1  
+    info3 = FindStartCode3 (Buf);//ï¿½Ð¶ï¿½ï¿½Ç·ï¿½Îª0x00000001  
+    if (info3 != 1)//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç£ï¿½ï¿½ï¿½ï¿½ï¿½-1  
         {   
          free(Buf);  
          return -1;  
         }  
     else   
         {  
-        //Èç¹ûÊÇ0x00000001,µÃµ½¿ªÊ¼Ç°×ºÎª4¸ö×Ö½Ú  
-//		printf ("¿ªÊ¼Ç°×ºÎª4¸ö×Ö½Ú");  
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0x00000001,ï¿½Ãµï¿½ï¿½ï¿½Ê¼Ç°×ºÎª4ï¿½ï¿½ï¿½Ö½ï¿½  
+//		printf ("ï¿½ï¿½Ê¼Ç°×ºÎª4ï¿½ï¿½ï¿½Ö½ï¿½");  
          pos = 4;  
          nalu->startcodeprefix_len = 4;  
         }  
@@ -148,11 +148,11 @@ int GetAnnexbNALU (NALU_t *nalu,SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
      
    else  
        {  
-       //Èç¹ûÊÇ0x000001,µÃµ½¿ªÊ¼Ç°×ºÎª3¸ö×Ö½Ú  
+       //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0x000001,ï¿½Ãµï¿½ï¿½ï¿½Ê¼Ç°×ºÎª3ï¿½ï¿½ï¿½Ö½ï¿½  
         nalu->startcodeprefix_len = 3;  
         pos = 3;  
        }  
-   //²éÕÒÏÂÒ»¸ö¿ªÊ¼×Ö·ûµÄ±êÖ¾Î»  £¬ÒòÎªÎÒÃ¿´Î´«µÄ¶¼±Ø¶¨ÊÇÒ»¸ö£¬ÊÇ²»ÊÇ²»ÐèÒªÕâÀïÁË
+   //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½Ö·ï¿½ï¿½Ä±ï¿½Ö¾Î»  ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Ã¿ï¿½Î´ï¿½ï¿½Ä¶ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ç²ï¿½ï¿½Ç²ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
    
    StartCodeFound = 0;  
    info2 = 0;  
@@ -160,7 +160,7 @@ int GetAnnexbNALU (NALU_t *nalu,SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
 
   while (!StartCodeFound)  
   {  
-    if (cursor == (oinfo.dataSize+oinfo.headerSize))//ÅÐ¶ÏÊÇ·ñµ½ÁËÎÄ¼þÎ²  
+    if (cursor == (oinfo.dataSize+oinfo.headerSize))//ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Î²  
     {  
       nalu->len = (pos)-nalu->startcodeprefix_len;  
       memcpy (nalu->buf, &Buf[nalu->startcodeprefix_len], nalu->len);       
@@ -168,28 +168,28 @@ int GetAnnexbNALU (NALU_t *nalu,SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
       nalu->nal_reference_idc = nalu->buf[0] & 0x60; // 2 bit  
       nalu->nal_unit_type = (nalu->buf[0]) & 0x1f;// 5 bit  
       free(Buf);  
-//	  printf("GetAnnexbNALU µ½´ïÎÄ¼þÄ©Î²£¬:%d ,%d",pos,cursor);
+//	  printf("GetAnnexbNALU ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Ä©Î²ï¿½ï¿½:%d ,%d",pos,cursor);
       return pos;  
     }  
-    //Buf[pos++] = fgetc (bits);//¶ÁÒ»¸ö×Ö½Úµ½BUFÖÐ 
+    //Buf[pos++] = fgetc (bits);//ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö½Úµï¿½BUFï¿½ï¿½ 
 	memcpy(Buf+pos,h264Buf+cursor,1);	
 	cursor++;
 	pos++;
-    info3 = FindStartCode3(&Buf[pos-4]);//ÅÐ¶ÏÊÇ·ñÎª0x00000001  
+    info3 = FindStartCode3(&Buf[pos-4]);//ï¿½Ð¶ï¿½ï¿½Ç·ï¿½Îª0x00000001  
     if(info3 != 1)  
-      info2 = FindStartCode2(&Buf[pos-3]);//ÅÐ¶ÏÊÇ·ñÎª0x000001  
+      info2 = FindStartCode2(&Buf[pos-3]);//ï¿½Ð¶ï¿½ï¿½Ç·ï¿½Îª0x000001  
     StartCodeFound = (info2 == 1 || info3 == 1);  
   }  
     
-//  printf("ÕÒµ½ÁË :pos:%d,cursor:%d ,startcodeprefix_len:%d\n",pos,cursor,nalu->startcodeprefix_len);
+//  printf("ï¿½Òµï¿½ï¿½ï¿½ :pos:%d,cursor:%d ,startcodeprefix_len:%d\n",pos,cursor,nalu->startcodeprefix_len);
    
   // Here, we have found another start code (and read length of startcode bytes more than we should  
   // have.  Hence, go back in the file  
   rewind = (info3 == 1)? -4 : -3;  
   cursor += rewind;
-  //ÒâÎª´ÓÎÄ¼þÖ¸ÕëstreamÖ¸ÏòµÄÎÄ¼þÖÐ¶ÁÈ¡Ò»¸ö×Ö·û£¬¶ÁÈ¡Ò»¸ö×Ö½Úºó£¬¹â±êÎ»ÖÃºóÒÆÒ»¸ö×Ö½Ú¡£
+  //ï¿½ï¿½Îªï¿½ï¿½ï¿½Ä¼ï¿½Ö¸ï¿½ï¿½streamÖ¸ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ð¶ï¿½È¡Ò»ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½È¡Ò»ï¿½ï¿½ï¿½Ö½Úºó£¬¹ï¿½ï¿½ï¿½Î»ï¿½Ãºï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö½Ú¡ï¿½
   /*)
-  if (0 != fseek (bits, rewind, SEEK_CUR))//°ÑÎÄ¼þÖ¸ÕëÖ¸ÏòÇ°Ò»¸öNALUµÄÄ©Î²  SEEK_CUR£º µ±Ç°Î»ÖÃ
+  if (0 != fseek (bits, rewind, SEEK_CUR))//ï¿½ï¿½ï¿½Ä¼ï¿½Ö¸ï¿½ï¿½Ö¸ï¿½ï¿½Ç°Ò»ï¿½ï¿½NALUï¿½ï¿½Ä©Î²  SEEK_CURï¿½ï¿½ ï¿½ï¿½Ç°Î»ï¿½ï¿½
   {  
     free(Buf);  
     printf("GetAnnexbNALU: Cannot fseek in the bit stream file");  
@@ -200,15 +200,15 @@ int GetAnnexbNALU (NALU_t *nalu,SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
   // start code, and (pos+rewind)-startcodeprefix_len is the size of the NALU excluding the start code  
   
   nalu->len = (pos+rewind)-nalu->startcodeprefix_len;  
-  memcpy (nalu->buf, &Buf[nalu->startcodeprefix_len], nalu->len);//¿½±´Ò»¸öÍêÕûNALU£¬²»¿½±´ÆðÊ¼Ç°×º0x000001»ò0x00000001  
+  memcpy (nalu->buf, &Buf[nalu->startcodeprefix_len], nalu->len);//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½NALUï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼Ç°×º0x000001ï¿½ï¿½0x00000001  
   nalu->forbidden_bit = nalu->buf[0] & 0x80; //1 bit  
   nalu->nal_reference_idc = nalu->buf[0] & 0x60; // 2 bit  
   nalu->nal_unit_type = (nalu->buf[0]) & 0x1f;// 5 bit  
   free(Buf);  
    
-  return (pos+rewind);//·µ»ØÁ½¸ö¿ªÊ¼×Ö·ûÖ®¼ä¼ä¸ôµÄ×Ö½ÚÊý£¬¼´°üº¬ÓÐÇ°×ºµÄNALUµÄ³¤¶È  
+  return (pos+rewind);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½Ö·ï¿½Ö®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°×ºï¿½ï¿½NALUï¿½Ä³ï¿½ï¿½ï¿½  
 }  
-//Êä³öNALU³¤¶ÈºÍTYPE  
+//ï¿½ï¿½ï¿½ï¿½NALUï¿½ï¿½ï¿½Èºï¿½TYPE  
 void dump(NALU_t *n)  
 {  
     if (!n)return;  
@@ -234,7 +234,7 @@ void initRTP(){
     server.sin_port=htons(DEST_PORT);            
     server.sin_addr.s_addr=inet_addr(DEST_IP);   
     socket1=socket(AF_INET,SOCK_DGRAM,0);  
-    connect(socket1, (const struct sockaddr *)&server, len) ;//ÉêÇëUDPÌ×½Ó×Ö  
+    connect(socket1, (const struct sockaddr *)&server, len) ;//ï¿½ï¿½ï¿½ï¿½UDPï¿½×½ï¿½ï¿½ï¿½  
 }
   
 int toRTP(SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)  
@@ -247,13 +247,13 @@ int toRTP(SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
 		}		
 		*/
 	cursor=0;
-	//printf("ÐÂÔöÍ¼Ïñ");
+	//printf("ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½");
 	if ((h264Buf = (unsigned char*)calloc (oinfo.headerSize+oinfo.dataSize , sizeof(char))) == NULL)   
-      printf ("ÐÂÔöÍ¼Ïñ: Could not allocate Buf memory\n");  
+      printf ("ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½: Could not allocate Buf memory\n");  
 	memcpy(h264Buf,h264HeadBuf,oinfo.headerSize);
 	memcpy(h264Buf+oinfo.headerSize,oinfo.StrmVirAddr,oinfo.dataSize);
 	
-	/*
+	
   	   FILE *fp_strm2;
 
 		
@@ -261,14 +261,14 @@ int toRTP(SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
 	   	   		if(fp_strm2==NULL) {
 			printf("Error: open output file\n");
 		}
-//	   printf("ÀÛ¼ÓÊä³ötest4\n");
+//	   printf("ï¿½Û¼ï¿½ï¿½ï¿½ï¿½ï¿½test4\n");
 	   fwrite(h264Buf,1,oinfo.dataSize+oinfo.headerSize,fp_strm2);
 //	   fwrite("AAAA",1,4,fp_strm2);
 //	   memcpy(h264Buf+oinfo.headerSize+oinfo.dataSize,oinfo.StrmVirAddr,4);
 	   fclose(fp_strm2);
-	   */
+	   
 	//printf(" oinfo.dataSize: %d ,headsize: %d \n", oinfo.dataSize,oinfo.headerSize);  
-    //OpenBitstreamFile("test2.h264");//´ò¿ª264ÎÄ¼þ£¬²¢½«ÎÄ¼þÖ¸Õë¸³¸øbits,ÔÚ´ËÐÞ¸ÄÎÄ¼þÃûÊµÏÖ´ò¿ª±ðµÄ264ÎÄ¼þ¡£  
+    //OpenBitstreamFile("test2.h264");//ï¿½ï¿½ï¿½ï¿½264ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Ö¸ï¿½ë¸³ï¿½ï¿½bits,ï¿½Ú´ï¿½ï¿½Þ¸ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Êµï¿½Ö´ò¿ª±ï¿½ï¿½ï¿½264ï¿½Ä¼ï¿½ï¿½ï¿½  
     NALU_t *n;  
     char* nalu_payload;    
     char sendbuf[1500];  
@@ -276,73 +276,73 @@ int toRTP(SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
     
     //printf("seq_num=%d\n",seq_num);//added by  
     int bytes=0;  
-    //InitWinsock(); //³õÊ¼»¯Ì×½Ó×Ö¿â  
+    //InitWinsock(); //ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½×½ï¿½ï¿½Ö¿ï¿½  
 
-    n = AllocNALU(8000000);//Îª½á¹¹Ìånalu_t¼°Æä³ÉÔ±buf·ÖÅä¿Õ¼ä¡£·µ»ØÖµÎªÖ¸Ïònalu_t´æ´¢¿Õ¼äµÄÖ¸Õë  
+    n = AllocNALU(8000000);//Îªï¿½á¹¹ï¿½ï¿½nalu_tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±bufï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä¡£ï¿½ï¿½ï¿½ï¿½ÖµÎªÖ¸ï¿½ï¿½nalu_tï¿½æ´¢ï¿½Õ¼ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½  
       
-    while(cursor < (oinfo.dataSize+oinfo.headerSize))  //Ö±µ½ÎÄ¼þ½áÊø£¬¸Ä½øµÄ»°Ó¦¸ÃÊÇ´«À´µÄÊý¾Ý·¢Íê 
+    while(cursor < (oinfo.dataSize+oinfo.headerSize))  //Ö±ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä½ï¿½ï¿½Ä»ï¿½Ó¦ï¿½ï¿½ï¿½Ç´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½ 
     {  
-		//--µÚÒ»´¦ÐÞ¸Ä
-		//printf("µ½´ïGetAnnexbNALU");
-        GetAnnexbNALU(n,oinfo);//Ã¿Ö´ÐÐÒ»´Î£¬ÎÄ¼þµÄÖ¸ÕëÖ¸Ïò±¾´ÎÕÒµ½µÄNALUµÄÄ©Î²£¬ÏÂÒ»¸öÎ»ÖÃ¼´ÎªÏÂ¸öNALUµÄÆðÊ¼Âë0x000001  
-        dump(n);//Êä³öNALU³¤¶ÈºÍTYPE  
+		//--ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Þ¸ï¿½
+		//printf("ï¿½ï¿½ï¿½ï¿½GetAnnexbNALU");
+        GetAnnexbNALU(n,oinfo);//Ã¿Ö´ï¿½ï¿½Ò»ï¿½Î£ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Ö¸ï¿½ò±¾´ï¿½ï¿½Òµï¿½ï¿½ï¿½NALUï¿½ï¿½Ä©Î²ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Î»ï¿½Ã¼ï¿½Îªï¿½Â¸ï¿½NALUï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½0x000001  
+        dump(n);//ï¿½ï¿½ï¿½ï¿½NALUï¿½ï¿½ï¿½Èºï¿½TYPE  
           
-        memset(sendbuf,0,1500);//Çå¿Õsendbuf£»´ËÊ±»á½«ÉÏ´ÎµÄÊ±¼ä´ÁÇå¿Õ£¬Òò´ËÐèÒªts_currentÀ´±£´æÉÏ´ÎµÄÊ±¼ä´ÁÖµ  
-    //rtp¹Ì¶¨°üÍ·£¬Îª12×Ö½Ú,¸Ã¾ä½«sendbuf[0]µÄµØÖ·¸³¸ørtp_hdr£¬ÒÔºó¶Ôrtp_hdrµÄÐ´Èë²Ù×÷½«Ö±½ÓÐ´Èësendbuf¡£  
+        memset(sendbuf,0,1500);//ï¿½ï¿½ï¿½ï¿½sendbufï¿½ï¿½ï¿½ï¿½Ê±ï¿½á½«ï¿½Ï´Îµï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªts_currentï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Îµï¿½Ê±ï¿½ï¿½ï¿½ï¿½Öµ  
+    //rtpï¿½Ì¶ï¿½ï¿½ï¿½Í·ï¿½ï¿½Îª12ï¿½Ö½ï¿½,ï¿½Ã¾ä½«sendbuf[0]ï¿½Äµï¿½Ö·ï¿½ï¿½ï¿½ï¿½rtp_hdrï¿½ï¿½ï¿½Ôºï¿½ï¿½ï¿½rtp_hdrï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½Ð´ï¿½ï¿½sendbufï¿½ï¿½  
         rtp_hdr =(RTP_FIXED_HEADER*)&sendbuf[0];   
-        //ÉèÖÃRTP HEADER£¬  
-        rtp_hdr->payload     = H264;  //¸ºÔØÀàÐÍºÅ£¬  
-        rtp_hdr->version     = 2;  //°æ±¾ºÅ£¬´Ë°æ±¾¹Ì¶¨Îª2  
-        rtp_hdr->marker    = 0;   //±êÖ¾Î»£¬ÓÉ¾ßÌåÐ­Òé¹æ¶¨ÆäÖµ¡£  
-        rtp_hdr->ssrc        = htonl(10);    //Ëæ»úÖ¸¶¨Îª10£¬²¢ÇÒÔÚ±¾RTP»á»°ÖÐÈ«¾ÖÎ¨Ò»  
+        //ï¿½ï¿½ï¿½ï¿½RTP HEADERï¿½ï¿½  
+        rtp_hdr->payload     = H264;  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÍºÅ£ï¿½  
+        rtp_hdr->version     = 2;  //ï¿½æ±¾ï¿½Å£ï¿½ï¿½Ë°æ±¾ï¿½Ì¶ï¿½Îª2  
+        rtp_hdr->marker    = 0;   //ï¿½ï¿½Ö¾Î»ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½Ð­ï¿½ï¿½ï¿½æ¶¨ï¿½ï¿½Öµï¿½ï¿½  
+        rtp_hdr->ssrc        = htonl(10);    //ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îª10ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú±ï¿½RTPï¿½á»°ï¿½ï¿½È«ï¿½ï¿½Î¨Ò»  
           
-    //  µ±Ò»¸öNALUÐ¡ÓÚ1400×Ö½ÚµÄÊ±ºò£¬²ÉÓÃÒ»¸öµ¥RTP°ü·¢ËÍ  
+    //  ï¿½ï¿½Ò»ï¿½ï¿½NALUÐ¡ï¿½ï¿½1400ï¿½Ö½Úµï¿½Ê±ï¿½ò£¬²ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½RTPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  
         if(n->len<=1400)  
         {     
-            //ÉèÖÃrtp M Î»£»  
+            //ï¿½ï¿½ï¿½ï¿½rtp M Î»ï¿½ï¿½  
             rtp_hdr->marker=1;  
-            rtp_hdr->seq_no     = htons(seq_num ++); //ÐòÁÐºÅ£¬Ã¿·¢ËÍÒ»¸öRTP°üÔö1  
-            //ÉèÖÃNALU HEADER,²¢½«Õâ¸öHEADERÌîÈësendbuf[12]  
-            nalu_hdr =(NALU_HEADER*)&sendbuf[12]; //½«sendbuf[12]µÄµØÖ·¸³¸ønalu_hdr£¬Ö®ºó¶Ônalu_hdrµÄÐ´Èë¾Í½«Ð´ÈësendbufÖÐ£»  
+            rtp_hdr->seq_no     = htons(seq_num ++); //ï¿½ï¿½ï¿½ÐºÅ£ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½RTPï¿½ï¿½ï¿½ï¿½1  
+            //ï¿½ï¿½ï¿½ï¿½NALU HEADER,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HEADERï¿½ï¿½ï¿½ï¿½sendbuf[12]  
+            nalu_hdr =(NALU_HEADER*)&sendbuf[12]; //ï¿½ï¿½sendbuf[12]ï¿½Äµï¿½Ö·ï¿½ï¿½ï¿½ï¿½nalu_hdrï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½nalu_hdrï¿½ï¿½Ð´ï¿½ï¿½ï¿½Í½ï¿½Ð´ï¿½ï¿½sendbufï¿½Ð£ï¿½  
             nalu_hdr->F=n->forbidden_bit;  
-            nalu_hdr->NRI=n->nal_reference_idc>>5;//ÓÐÐ§Êý¾ÝÔÚn->nal_reference_idcµÄµÚ6£¬7Î»£¬ÐèÒªÓÒÒÆ5Î»²ÅÄÜ½«ÆäÖµ¸³¸ønalu_hdr->NRI¡£  
+            nalu_hdr->NRI=n->nal_reference_idc>>5;//ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½n->nal_reference_idcï¿½Äµï¿½6ï¿½ï¿½7Î»ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½5Î»ï¿½ï¿½ï¿½Ü½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½nalu_hdr->NRIï¿½ï¿½  
             nalu_hdr->TYPE=n->nal_unit_type;  
   
-            nalu_payload=&sendbuf[13];//Í¬Àí½«sendbuf[13]¸³¸ønalu_payload  
-            memcpy(nalu_payload,n->buf+1,n->len-1);//È¥µônaluÍ·µÄnaluÊ£ÓàÄÚÈÝÐ´Èësendbuf[13]¿ªÊ¼µÄ×Ö·û´®¡£  
+            nalu_payload=&sendbuf[13];//Í¬ï¿½ï¿½ï¿½ï¿½sendbuf[13]ï¿½ï¿½ï¿½ï¿½nalu_payload  
+            memcpy(nalu_payload,n->buf+1,n->len-1);//È¥ï¿½ï¿½naluÍ·ï¿½ï¿½naluÊ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½sendbuf[13]ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½  
 //			printf(" ts_current:%d,seq_num:%d\n  ", ts_current,seq_num);
             ts_current=ts_current+timestamp_increase;  
             rtp_hdr->timestamp=htonl(ts_current);  
-            bytes=n->len + 13 ;                      //»ñµÃsendbufµÄ³¤¶È,ÎªnaluµÄ³¤¶È£¨°üº¬NALUÍ·µ«³ýÈ¥ÆðÊ¼Ç°×º£©¼ÓÉÏrtp_headerµÄ¹Ì¶¨³¤¶È12×Ö½Ú  
-            send( socket1, sendbuf, bytes, 0 );//·¢ËÍrtp°ü  
+            bytes=n->len + 13 ;                      //ï¿½ï¿½ï¿½ï¿½sendbufï¿½Ä³ï¿½ï¿½ï¿½,Îªnaluï¿½Ä³ï¿½ï¿½È£ï¿½ï¿½ï¿½ï¿½ï¿½NALUÍ·ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½Ê¼Ç°×ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rtp_headerï¿½Ä¹Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½12ï¿½Ö½ï¿½  
+            send( socket1, sendbuf, bytes, 0 );//ï¿½ï¿½ï¿½ï¿½rtpï¿½ï¿½  
             //sleep(1);  
 //fwrite(sendbuf,bytes, 1, stream);   
         }  
           
         else if(n->len>1400)  
         {  
-            //µÃµ½¸ÃnaluÐèÒªÓÃ¶àÉÙ³¤¶ÈÎª1400×Ö½ÚµÄRTP°üÀ´·¢ËÍ  
+            //ï¿½Ãµï¿½ï¿½ï¿½naluï¿½ï¿½Òªï¿½Ã¶ï¿½ï¿½Ù³ï¿½ï¿½ï¿½Îª1400ï¿½Ö½Úµï¿½RTPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  
             int k=0,l=0;  
-            k=n->len/1400;//ÐèÒªk¸ö1400×Ö½ÚµÄRTP°ü  
-            l=n->len%1400;//×îºóÒ»¸öRTP°üµÄÐèÒª×°ÔØµÄ×Ö½ÚÊý  
-            int t=0;//ÓÃÓÚÖ¸Ê¾µ±Ç°·¢ËÍµÄÊÇµÚ¼¸¸ö·ÖÆ¬RTP°ü  
+            k=n->len/1400;//ï¿½ï¿½Òªkï¿½ï¿½1400ï¿½Ö½Úµï¿½RTPï¿½ï¿½  
+            l=n->len%1400;//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½RTPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òª×°ï¿½Øµï¿½ï¿½Ö½ï¿½ï¿½ï¿½  
+            int t=0;//ï¿½ï¿½ï¿½ï¿½Ö¸Ê¾ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Íµï¿½ï¿½ÇµÚ¼ï¿½ï¿½ï¿½ï¿½ï¿½Æ¬RTPï¿½ï¿½  
 //			printf(" ts_current:%d,seq_num:%d\n  ", ts_current,seq_num);
             ts_current=ts_current+timestamp_increase;  
             rtp_hdr->timestamp=htonl(ts_current);  
             while(t<=k)  
             {  
-                rtp_hdr->seq_no = htons(seq_num ++); //ÐòÁÐºÅ£¬Ã¿·¢ËÍÒ»¸öRTP°üÔö1  
-                if(!t)//·¢ËÍÒ»¸öÐèÒª·ÖÆ¬µÄNALUµÄµÚÒ»¸ö·ÖÆ¬£¬ÖÃFU HEADERµÄSÎ»  
+                rtp_hdr->seq_no = htons(seq_num ++); //ï¿½ï¿½ï¿½ÐºÅ£ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½RTPï¿½ï¿½ï¿½ï¿½1  
+                if(!t)//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Æ¬ï¿½ï¿½NALUï¿½Äµï¿½Ò»ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½FU HEADERï¿½ï¿½SÎ»  
                 {  
-                    //ÉèÖÃrtp M Î»£»  
+                    //ï¿½ï¿½ï¿½ï¿½rtp M Î»ï¿½ï¿½  
                     rtp_hdr->marker=0;  
-                    //ÉèÖÃFU INDICATOR,²¢½«Õâ¸öHEADERÌîÈësendbuf[12]  
-                    fu_ind =(FU_INDICATOR*)&sendbuf[12]; //½«sendbuf[12]µÄµØÖ·¸³¸øfu_ind£¬Ö®ºó¶Ôfu_indµÄÐ´Èë¾Í½«Ð´ÈësendbufÖÐ£»  
+                    //ï¿½ï¿½ï¿½ï¿½FU INDICATOR,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HEADERï¿½ï¿½ï¿½ï¿½sendbuf[12]  
+                    fu_ind =(FU_INDICATOR*)&sendbuf[12]; //ï¿½ï¿½sendbuf[12]ï¿½Äµï¿½Ö·ï¿½ï¿½ï¿½ï¿½fu_indï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½fu_indï¿½ï¿½Ð´ï¿½ï¿½ï¿½Í½ï¿½Ð´ï¿½ï¿½sendbufï¿½Ð£ï¿½  
                     fu_ind->F=n->forbidden_bit;  
                     fu_ind->NRI=n->nal_reference_idc>>5;  
                     fu_ind->TYPE=28;  
                       
-                    //ÉèÖÃFU HEADER,²¢½«Õâ¸öHEADERÌîÈësendbuf[13]  
+                    //ï¿½ï¿½ï¿½ï¿½FU HEADER,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HEADERï¿½ï¿½ï¿½ï¿½sendbuf[13]  
                     fu_hdr =(FU_HEADER*)&sendbuf[13];  
                     fu_hdr->E=0;  
                     fu_hdr->R=0;  
@@ -350,54 +350,54 @@ int toRTP(SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
                     fu_hdr->TYPE=n->nal_unit_type;  
                       
                   
-                    nalu_payload=&sendbuf[14];//Í¬Àí½«sendbuf[14]¸³¸ønalu_payload  
-                    memcpy(nalu_payload,n->buf+1,1400);//È¥µôNALUÍ·  
+                    nalu_payload=&sendbuf[14];//Í¬ï¿½ï¿½ï¿½ï¿½sendbuf[14]ï¿½ï¿½ï¿½ï¿½nalu_payload  
+                    memcpy(nalu_payload,n->buf+1,1400);//È¥ï¿½ï¿½NALUÍ·  
                       
-                    bytes=1400+14;                      //»ñµÃsendbufµÄ³¤¶È,ÎªnaluµÄ³¤¶È£¨³ýÈ¥ÆðÊ¼Ç°×ººÍNALUÍ·£©¼ÓÉÏrtp_header£¬fu_ind£¬fu_hdrµÄ¹Ì¶¨³¤¶È14×Ö½Ú  
-                    send( socket1, sendbuf, bytes, 0 );//·¢ËÍrtp°ü  
+                    bytes=1400+14;                      //ï¿½ï¿½ï¿½ï¿½sendbufï¿½Ä³ï¿½ï¿½ï¿½,Îªnaluï¿½Ä³ï¿½ï¿½È£ï¿½ï¿½ï¿½È¥ï¿½ï¿½Ê¼Ç°×ºï¿½ï¿½NALUÍ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rtp_headerï¿½ï¿½fu_indï¿½ï¿½fu_hdrï¿½Ä¹Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½14ï¿½Ö½ï¿½  
+                    send( socket1, sendbuf, bytes, 0 );//ï¿½ï¿½ï¿½ï¿½rtpï¿½ï¿½  
 //fwrite(sendbuf,bytes, 1, stream);  
                                         //sleep(1);  
                     t++;  
                       
                 }  
-                //·¢ËÍÒ»¸öÐèÒª·ÖÆ¬µÄNALUµÄ·ÇµÚÒ»¸ö·ÖÆ¬£¬ÇåÁãFU HEADERµÄSÎ»£¬Èç¹û¸Ã·ÖÆ¬ÊÇ¸ÃNALUµÄ×îºóÒ»¸ö·ÖÆ¬£¬ÖÃFU HEADERµÄEÎ»  
-                else if(k==t)//·¢ËÍµÄÊÇ×îºóÒ»¸ö·ÖÆ¬£¬×¢Òâ×îºóÒ»¸ö·ÖÆ¬µÄ³¤¶È¿ÉÄÜ³¬¹ý1400×Ö½Ú£¨µ±l>1386Ê±£©¡£  
+                //ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Æ¬ï¿½ï¿½NALUï¿½Ä·Çµï¿½Ò»ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½FU HEADERï¿½ï¿½SÎ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã·ï¿½Æ¬ï¿½Ç¸ï¿½NALUï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½FU HEADERï¿½ï¿½EÎ»  
+                else if(k==t)//ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½ï¿½×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½Ä³ï¿½ï¿½È¿ï¿½ï¿½Ü³ï¿½ï¿½ï¿½1400ï¿½Ö½Ú£ï¿½ï¿½ï¿½l>1386Ê±ï¿½ï¿½ï¿½ï¿½  
                 {  
                       
-                    //ÉèÖÃrtp M Î»£»µ±Ç°´«ÊäµÄÊÇ×îºóÒ»¸ö·ÖÆ¬Ê±¸ÃÎ»ÖÃ1  
+                    //ï¿½ï¿½ï¿½ï¿½rtp M Î»ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Æ¬Ê±ï¿½ï¿½Î»ï¿½ï¿½1  
                     rtp_hdr->marker=1;  
-                    //ÉèÖÃFU INDICATOR,²¢½«Õâ¸öHEADERÌîÈësendbuf[12]  
-                    fu_ind =(FU_INDICATOR*)&sendbuf[12]; //½«sendbuf[12]µÄµØÖ·¸³¸øfu_ind£¬Ö®ºó¶Ôfu_indµÄÐ´Èë¾Í½«Ð´ÈësendbufÖÐ£»  
+                    //ï¿½ï¿½ï¿½ï¿½FU INDICATOR,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HEADERï¿½ï¿½ï¿½ï¿½sendbuf[12]  
+                    fu_ind =(FU_INDICATOR*)&sendbuf[12]; //ï¿½ï¿½sendbuf[12]ï¿½Äµï¿½Ö·ï¿½ï¿½ï¿½ï¿½fu_indï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½fu_indï¿½ï¿½Ð´ï¿½ï¿½ï¿½Í½ï¿½Ð´ï¿½ï¿½sendbufï¿½Ð£ï¿½  
                     fu_ind->F=n->forbidden_bit;  
                     fu_ind->NRI=n->nal_reference_idc>>5;  
                     fu_ind->TYPE=28;  
                           
-                    //ÉèÖÃFU HEADER,²¢½«Õâ¸öHEADERÌîÈësendbuf[13]  
+                    //ï¿½ï¿½ï¿½ï¿½FU HEADER,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HEADERï¿½ï¿½ï¿½ï¿½sendbuf[13]  
                     fu_hdr =(FU_HEADER*)&sendbuf[13];  
                     fu_hdr->R=0;  
                     fu_hdr->S=0;  
                     fu_hdr->TYPE=n->nal_unit_type;  
                     fu_hdr->E=1;  
   
-                    nalu_payload=&sendbuf[14];//Í¬Àí½«sendbuf[14]µÄµØÖ·¸³¸ønalu_payload  
-                    memcpy(nalu_payload,n->buf+t*1400+1,l-1);//½«nalu×îºóÊ£ÓàµÄl-1(È¥µôÁËÒ»¸ö×Ö½ÚµÄNALUÍ·)×Ö½ÚÄÚÈÝÐ´Èësendbuf[14]¿ªÊ¼µÄ×Ö·û´®¡£  
-                    bytes=l-1+14;       //»ñµÃsendbufµÄ³¤¶È,ÎªÊ£ÓànaluµÄ³¤¶Èl-1¼ÓÉÏrtp_header£¬FU_INDICATOR,FU_HEADERÈý¸ö°üÍ·¹²14×Ö½Ú  
-                    send( socket1, sendbuf, bytes, 0 );//·¢ËÍrtp°ü  
+                    nalu_payload=&sendbuf[14];//Í¬ï¿½ï¿½ï¿½ï¿½sendbuf[14]ï¿½Äµï¿½Ö·ï¿½ï¿½ï¿½ï¿½nalu_payload  
+                    memcpy(nalu_payload,n->buf+t*1400+1,l-1);//ï¿½ï¿½naluï¿½ï¿½ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½l-1(È¥ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö½Úµï¿½NALUÍ·)ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½sendbuf[14]ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½  
+                    bytes=l-1+14;       //ï¿½ï¿½ï¿½ï¿½sendbufï¿½Ä³ï¿½ï¿½ï¿½,ÎªÊ£ï¿½ï¿½naluï¿½Ä³ï¿½ï¿½ï¿½l-1ï¿½ï¿½ï¿½ï¿½rtp_headerï¿½ï¿½FU_INDICATOR,FU_HEADERï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½14ï¿½Ö½ï¿½  
+                    send( socket1, sendbuf, bytes, 0 );//ï¿½ï¿½ï¿½ï¿½rtpï¿½ï¿½  
 //fwrite(sendbuf,bytes, 1, stream);  
                     t++;  
                     //sleep(1);  
                 }  
                 else if(t<k&&0!=t)  
                 {  
-                    //ÉèÖÃrtp M Î»£»  
+                    //ï¿½ï¿½ï¿½ï¿½rtp M Î»ï¿½ï¿½  
                     rtp_hdr->marker=0;  
-                    //ÉèÖÃFU INDICATOR,²¢½«Õâ¸öHEADERÌîÈësendbuf[12]  
-                    fu_ind =(FU_INDICATOR*)&sendbuf[12]; //½«sendbuf[12]µÄµØÖ·¸³¸øfu_ind£¬Ö®ºó¶Ôfu_indµÄÐ´Èë¾Í½«Ð´ÈësendbufÖÐ£»  
+                    //ï¿½ï¿½ï¿½ï¿½FU INDICATOR,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HEADERï¿½ï¿½ï¿½ï¿½sendbuf[12]  
+                    fu_ind =(FU_INDICATOR*)&sendbuf[12]; //ï¿½ï¿½sendbuf[12]ï¿½Äµï¿½Ö·ï¿½ï¿½ï¿½ï¿½fu_indï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½fu_indï¿½ï¿½Ð´ï¿½ï¿½ï¿½Í½ï¿½Ð´ï¿½ï¿½sendbufï¿½Ð£ï¿½  
                     fu_ind->F=n->forbidden_bit;  
                     fu_ind->NRI=n->nal_reference_idc>>5;  
                     fu_ind->TYPE=28;  
                           
-                    //ÉèÖÃFU HEADER,²¢½«Õâ¸öHEADERÌîÈësendbuf[13]  
+                    //ï¿½ï¿½ï¿½ï¿½FU HEADER,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HEADERï¿½ï¿½ï¿½ï¿½sendbuf[13]  
                     fu_hdr =(FU_HEADER*)&sendbuf[13];  
                     //fu_hdr->E=0;  
                     fu_hdr->R=0;  
@@ -405,10 +405,10 @@ int toRTP(SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
                     fu_hdr->E=0;  
                     fu_hdr->TYPE=n->nal_unit_type;  
                   
-                    nalu_payload=&sendbuf[14];//Í¬Àí½«sendbuf[14]µÄµØÖ·¸³¸ønalu_payload  
-                    memcpy(nalu_payload,n->buf+t*1400+1,1400);//È¥µôÆðÊ¼Ç°×ºµÄnaluÊ£ÓàÄÚÈÝÐ´Èësendbuf[14]¿ªÊ¼µÄ×Ö·û´®¡£  
-                    bytes=1400+14;                      //»ñµÃsendbufµÄ³¤¶È,ÎªnaluµÄ³¤¶È£¨³ýÈ¥Ô­NALUÍ·£©¼ÓÉÏrtp_header£¬fu_ind£¬fu_hdrµÄ¹Ì¶¨³¤¶È14×Ö½Ú  
-                    send( socket1, sendbuf, bytes, 0 );//·¢ËÍrtp°ü  
+                    nalu_payload=&sendbuf[14];//Í¬ï¿½ï¿½ï¿½ï¿½sendbuf[14]ï¿½Äµï¿½Ö·ï¿½ï¿½ï¿½ï¿½nalu_payload  
+                    memcpy(nalu_payload,n->buf+t*1400+1,1400);//È¥ï¿½ï¿½ï¿½ï¿½Ê¼Ç°×ºï¿½ï¿½naluÊ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½sendbuf[14]ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½  
+                    bytes=1400+14;                      //ï¿½ï¿½ï¿½ï¿½sendbufï¿½Ä³ï¿½ï¿½ï¿½,Îªnaluï¿½Ä³ï¿½ï¿½È£ï¿½ï¿½ï¿½È¥Ô­NALUÍ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rtp_headerï¿½ï¿½fu_indï¿½ï¿½fu_hdrï¿½Ä¹Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½14ï¿½Ö½ï¿½  
+                    send( socket1, sendbuf, bytes, 0 );//ï¿½ï¿½ï¿½ï¿½rtpï¿½ï¿½  
 //fwrite(sendbuf,bytes, 1, stream);  
                                         //sleep(1);  
                     t++;  
@@ -426,12 +426,12 @@ int toRTP(SSBSIP_MFC_ENC_OUTPUT_INFO oinfo)
   
 static int FindStartCode2 (unsigned char *Buf)  
 {  
- if(Buf[0]!=0 || Buf[1]!=0 || Buf[2] !=1) return 0; //ÅÐ¶ÏÊÇ·ñÎª0x000001,Èç¹ûÊÇ·µ»Ø1  
+ if(Buf[0]!=0 || Buf[1]!=0 || Buf[2] !=1) return 0; //ï¿½Ð¶ï¿½ï¿½Ç·ï¿½Îª0x000001,ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½1  
  else return 1;  
 }  
   
 static int FindStartCode3 (unsigned char *Buf)  
 {  
- if(Buf[0]!=0 || Buf[1]!=0 || Buf[2] !=0 || Buf[3] !=1) return 0;//ÅÐ¶ÏÊÇ·ñÎª0x00000001,Èç¹ûÊÇ·µ»Ø1  
+ if(Buf[0]!=0 || Buf[1]!=0 || Buf[2] !=0 || Buf[3] !=1) return 0;//ï¿½Ð¶ï¿½ï¿½Ç·ï¿½Îª0x00000001,ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½1  
  else return 1;  
 }  

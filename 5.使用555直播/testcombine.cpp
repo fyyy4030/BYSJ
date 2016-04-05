@@ -50,8 +50,8 @@ public:
 	}
 	virtual ~TRect() {
 	}
-	bool DrawRect(const TRect bitand SrcRect, int x, int y) const { //bitand 锟洁当锟斤拷 & 锟斤拷锟斤拷实锟斤拷
-		if (BPP not_eq 32 or SrcRect.BPP not_eq 32) {//锟斤拷锟斤拷前锟斤拷锟斤拷锟斤拷锟矫癸拷锟斤拷锟叫匡拷锟斤拷锟斤拷锟斤拷X锟斤拷锟斤拷锟斤拷使锟矫讹拷锟斤拷色锟斤拷锟斤拷锟饺ｏ拷锟斤拷8bpp锟斤拷 16bpp锟斤拷24bpp锟斤拷32bpp锟斤拷一锟斤拷锟斤拷锟斤拷色锟斤拷锟斤拷锟斤拷越锟斤拷锟斤拷锟斤拷锟杰憋拷锟街碉拷色锟斤拷越锟结富锟斤拷锟斤拷 24bpp锟酵憋拷锟斤拷为锟斤拷锟斤拷色锟斤拷锟斤拷锟斤拷实锟侥憋拷锟斤拷图锟斤拷锟斤拷色锟绞ｏ拷32bpp实锟斤拷也只锟斤拷24bpp锟斤拷 锟斤拷锟斤拷为锟斤拷锟斤拷每锟斤拷锟斤拷锟截讹拷占锟捷讹拷锟斤拷锟斤拷32位双锟街ｏ拷锟皆讹拷锟斤拷锟斤拷锟截边界，锟斤拷锟劫达拷锟斤拷锟劫度ｏ拷 
+	bool DrawRect(const TRect bitand SrcRect, int x, int y) const { //bitand 相当于 & 传的实参
+		if (BPP not_eq 32 or SrcRect.BPP not_eq 32) {//　在前面的设置过程中可以设置X服务器使用多种色彩深度，如8bpp、 16bpp、24bpp和32bpp，一般来讲色彩深度越大，所能表现的色彩越丰富，而 24bpp就被称为真彩色，能真实的表现图象的色彩（32bpp实际也只是24bpp， 它是为了让每个象素都占据独立的32位双字，以对齐象素边界，加速处理速度） 
 			// don't support that yet
 			throw TError("does not support other than 32 BPP yet");
 		}
@@ -92,8 +92,8 @@ public:
 		unsigned char *DstPtr = Addr + LineLen * y0 + x0 * BPP / 8;
 		const unsigned char *SrcPtr = SrcRect.Addr + SrcRect.LineLen *(y0 - y) + (x0 - x) * SrcRect.BPP / 8;
 
-		for (int i = y0; i <= y1; i++) {//FrameByffer锟斤拷Addr锟斤拷锟斤拷锟斤拷幕锟斤拷映锟斤拷锟斤拷址
-			memcpy(DstPtr, SrcPtr, copyLineLen); //memcpy锟斤拷锟斤拷锟侥癸拷锟斤拷锟角达拷源src锟斤拷指锟斤拷锟节达拷锟斤拷址锟斤拷锟斤拷始位锟矫匡拷始锟斤拷锟斤拷n锟斤拷锟街节碉拷目锟斤拷dest锟斤拷指锟斤拷锟节达拷锟斤拷址锟斤拷锟斤拷始位锟斤拷锟叫★拷
+		for (int i = y0; i <= y1; i++) {//FrameByffer的Addr就是屏幕的映射地址
+			memcpy(DstPtr, SrcPtr, copyLineLen); //memcpy函数的功能是从源src所指的内存地址的起始位置开始拷贝n个字节到目标dest所指的内存地址的起始位置中。
 			DstPtr += LineLen;
 			SrcPtr += SrcRect.LineLen;
 		}
@@ -103,7 +103,7 @@ public:
 	}
 
 	bool DrawRect(const TRect bitand rect) const { // default is Center
-		return DrawRect(rect, (Width - rect.Width) / 2, (Height - rect.Height) / 2);//锟斤拷锟斤拷一锟斤拷锟斤拷锟斤拷
+		return DrawRect(rect, (Width - rect.Width) / 2, (Height - rect.Height) / 2);//计算一下中心
 	}
 
 	bool Clear() const {
@@ -130,7 +130,7 @@ protected:
 
 class TFrameBuffer: public TRect {
 public:
-	TFrameBuffer(const char *DeviceName = "/dev/fb0"): TRect(), fd(-1) {// 锟斤拷锟角讹拷锟斤拷幕锟侥讹拷写锟酵匡拷锟斤拷转锟斤拷锟缴讹拷/dev/fb0,锟斤拷锟斤拷锟角讹拷锟斤拷幕锟侥诧拷锟斤拷锟斤拷
+	TFrameBuffer(const char *DeviceName = "/dev/fb0"): TRect(), fd(-1) {// 我们对屏幕的读写就可以转换成对/dev/fb0,这里是对屏幕的操作，
 		Addr = (unsigned char *)MAP_FAILED;
 
         fd = open(DeviceName, O_RDWR);
@@ -155,10 +155,10 @@ public:
         	LineLen = Fix.line_length;
       		Size = LineLen * Height;
 
-		int PageSize = getpagesize();    //使锟斤拷getpagesize锟斤拷锟斤拷锟斤拷锟斤拷一页锟节达拷锟斤拷小
+		int PageSize = getpagesize();    //使用getpagesize函数获得一页内存大小
 		Size = (Size + PageSize - 1) / PageSize * PageSize ;
-	        Addr = (unsigned char *)mmap(NULL, Size, PROT_READ|PROT_WRITE,MAP_SHARED, fd, 0);//映锟斤拷锟斤拷幕锟斤拷锟斤拷锟斤拷址
-		if (Addr == (unsigned char *)MAP_FAILED) {//锟斤拷锟斤拷锟斤拷锟睫变化锟斤拷然锟斤拷锟斤拷失锟斤拷锟斤拷
+	        Addr = (unsigned char *)mmap(NULL, Size, PROT_READ|PROT_WRITE,MAP_SHARED, fd, 0);//映射屏幕操作地址
+		if (Addr == (unsigned char *)MAP_FAILED) {//如果毫无变化当然就是失败了
 			throw TError("map frame buffer failed");
 			return;
 		}
@@ -196,6 +196,7 @@ public:
 		Addr = new unsigned char[Size];
 		Clear();
 
+		initMFC();
         OpenDevice();
         StartStream();
 	}
@@ -219,6 +220,8 @@ protected:
     void OpenDevice();
     void StartStream();
     void StopStream();
+	int initMFC();
+	void closeMFC();
 	
 	int fd;
     bool Valid;
@@ -226,13 +229,8 @@ protected:
 	static const int CAPTURE_BUFFER_NUMBER = 1;
 	struct { void * data; int len; } captureBuffer[CAPTURE_BUFFER_NUMBER];
 	
-};
-
-//锟斤拷yuv420转锟斤拷h264 锟斤拷式
-int TVideo::toH264(unsigned char* yuv420sp)
-{
-		unsigned int buf_type = NO_CACHE;
-		void *openHandle;
+	//MFC
+	void *openHandle;
 	#if defined TEST_H264
 		SSBSIP_MFC_ENC_H264_PARAM *param;
 	#elif defined TEST_H263
@@ -246,17 +244,23 @@ int TVideo::toH264(unsigned char* yuv420sp)
 		SSBSIP_MFC_ENC_OUTPUT_INFO oinfo;
 		
 		FILE *fp_nv12, *fp_strm;
-		
-		int retv = 0;
-		//test.nv12
-		/*
-		fp_nv12 = fopen("hello.yuv","rb");  //锟斤拷锟杰达拷锟侥硷拷锟斤拷锟斤拷锟剿ｏ拷锟斤拷锟斤拷要锟斤拷一锟铰可诧拷锟斤拷锟皆ｏ拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷NV12
-		if(fp_nv12==NULL) {
-			fprintf(stderr,"Error: open test.nv12\n");
-			retv = 1;
-			goto exit_end;
+	int retv;
+};
+
+void TVideo::closeMFC(){
+		free(param);
+		err = SsbSipMfcEncClose(openHandle);
+		if(err<0) {
+			fprintf(stderr,"Error: SsbSipMfcEncClose. Code %d\n",err);
 		}
-		*/	
+}
+
+int TVideo::initMFC(){
+		unsigned int buf_type = NO_CACHE;
+
+		retv = 0;
+
+		
 	#if defined TEST_H264
 		fp_strm = fopen("test2.h264","a+");
 	#elif defined TEST_H263
@@ -371,7 +375,7 @@ int TVideo::toH264(unsigned char* yuv420sp)
 			return retv;
 		}else {
 			//printf("SsbSipMfcEncGetOutBuf suceeded\n");
-//			printf("锟斤拷锟斤拷锟斤拷锟剿革拷noth263头\n");
+//			printf("进来加了个noth263头\n");
 			fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
 			addHead(oinfo);
 		}
@@ -396,25 +400,44 @@ int TVideo::toH264(unsigned char* yuv420sp)
 		}else {
 			//printf("SsbSipMfcEncGetInBuf succeeded\n");
 		}
+		fclose(fp_strm);
+}
 
+
+//将yuv420转成h264 格式
+int TVideo::toH264(unsigned char* yuv420sp)
+{
+	
+	#if defined TEST_H264
+		fp_strm = fopen("test2.h264","a+");
+	#elif defined TEST_H263
+		fp_strm = fopen("test.h263","wb");
+	#else
+		fp_strm = fopen("test.mpeg4","wb");
+	#endif
+		if(fp_strm==NULL) {
+			fprintf(stderr,"Error: open output file\n");
+			retv = 1;
+			return 0;
+		}
 		
 		int w=param->SourceWidth;
 		int h=param->SourceHeight;
 		//int frmcnt = 0;
 		//size_t fread ( void *buffer, size_t size, size_t count, FILE *stream) ;
-		//锟斤拷 锟斤拷
+		//参 数
 		//buffer
-		//锟斤拷锟节斤拷锟斤拷锟斤拷锟捷碉拷锟节达拷锟斤拷址
+		//用于接收数据的内存地址
 		//size
-		//要锟斤拷锟斤拷每锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟街斤拷锟斤拷锟斤拷锟斤拷位锟斤拷锟街斤拷
+		//要读的每个数据项的字节数，单位是字节
 		//count
-		//要锟斤拷count锟斤拷锟斤拷锟斤拷锟筋，每锟斤拷锟斤拷锟斤拷锟斤拷size锟斤拷锟街斤拷.
+		//要读count个数据项，每个数据项size个字节.
 		//stream
-		//锟斤拷锟斤拷锟斤拷
-		//锟斤拷fp_nv12锟斤拷锟斤拷写锟斤拷linfo.YVirAddr锟叫ｏ拷2锟斤拷锟斤拷
-		//锟斤拷锟斤拷值
-		//实锟绞讹拷取锟斤拷元锟截革拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷值锟斤拷count锟斤拷锟斤拷同锟斤拷锟斤拷锟斤拷锟斤拷锟侥硷拷锟斤拷尾锟斤拷锟斤拷锟斤拷锟斤拷锟襟。达拷ferror锟斤拷feof锟斤拷取锟斤拷锟斤拷锟斤拷息锟斤拷锟斤拷锟斤拷锟角否到达拷锟侥硷拷锟斤拷尾锟斤拷锟斤拷
-		//if(fread(iinfo.YVirAddr,1,w*h,fp_nv12)==w*h && fread(iinfo.CVirAddr,1,w*h/2,fp_nv12)==w*h/2) {//锟斤拷取锟侥硷拷锟叫碉拷NV12锟斤拷锟捷ｏ拷要锟睫革拷为锟秸刚得碉拷锟侥ｏ拷锟斤拷为每锟轿讹拷要锟皆硷拷wait锟斤拷应锟矫诧拷锟斤拷循锟斤拷
+		//输入流
+		//从fp_nv12读，写到linfo.YVirAddr中，2进制
+		//返回值
+		//实际读取的元素个数。如果返回值与count不相同，则可能文件结尾或发生错误。从ferror和feof获取错误信息或检测是否到达文件结尾。　
+		//if(fread(iinfo.YVirAddr,1,w*h,fp_nv12)==w*h && fread(iinfo.CVirAddr,1,w*h/2,fp_nv12)==w*h/2) {//读取文件中的NV12数据，要修改为刚刚得到的，因为每次都要自己wait，应该不用循环
 		memcpy(iinfo.YVirAddr,yuv420sp,w*h);
 		memcpy(iinfo.CVirAddr,yuv420sp+w*h,w*h/2);
 			err = SsbSipMfcEncSetInBuf(openHandle,&iinfo);
@@ -447,21 +470,14 @@ int TVideo::toH264(unsigned char* yuv420sp)
 			}
 			
 			fwrite(oinfo.StrmVirAddr,1,oinfo.dataSize,fp_strm);
+	
 			toRTP(oinfo);  
 			//printf("oinfo.StrmVirAddr=0x%x, oinfo.dataSize=%d.\n",(unsigned)oinfo.StrmVirAddr,oinfo.dataSize);
 			//printf("Frame # %d encoded\n", frmcnt++);
 		
 		// clear up
-	exit_param:
-		free(param);
-		err = SsbSipMfcEncClose(openHandle);
-		if(err<0) {
-			fprintf(stderr,"Error: SsbSipMfcEncClose. Code %d\n",err);
-		}
-		
-	fclose(fp_strm);
-		
-	exit_end:
+	exit_end:	
+		fclose(fp_strm);
 		return retv;
 
 }
@@ -485,7 +501,7 @@ void TVideo::OpenDevice()
 		return;
 	}
 	fprintf(stderr, "start test\n");
-			//锟斤拷锟斤拷支锟街的分憋拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷头锟斤拷锟今并诧拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷
+			//测试支持的分辨率,这个摄像头好像并不能输出他们
 		enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		struct v4l2_fmtdesc fmt2;
 		struct v4l2_frmsizeenum frmsize;
@@ -608,7 +624,7 @@ void TVideo::OpenDevice()
     		fprintf(stderr, "unable to map capture buffer\n");
     		return;
     	}
-        //直锟接达拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷图片锟斤拷一锟斤拷锟斤拷什么锟斤拷锟接ｏ拷每锟斤拷执锟斤拷指锟斤拷锟斤拷锟斤拷一锟斤拷ImageSize.
+        //直接从这里输出的图片看一看长什么样子，每次执行指挥输出一次ImageSize.
         fprintf(stderr, "ImageSize[%d] = %ld\n", i, b.length);
     }
 
@@ -627,7 +643,7 @@ void TVideo::OpenDevice()
 
     memset(&m_events_c, 0, sizeof(m_events_c));
     m_events_c.fd = fd;
-    m_events_c.events = POLLIN | POLLERR;  //锟斤拷锟斤拷 锟斤拷 锟斤拷 锟届常锟铰硷拷
+    m_events_c.events = POLLIN | POLLERR;  //监听 读 和 异常事件
     
 	return;
 }
@@ -673,13 +689,13 @@ void TVideo::StopStream()
 }
 
 bool TVideo::WaitPic()
-{//int poll(struct pollfd fds[], nfds_t nfds, int timeout)锟斤拷
-//锟斤拷锟斤拷说锟斤拷:
-//fds锟斤拷锟斤拷一锟斤拷struct pollfd锟结构锟斤拷锟酵碉拷锟斤拷锟介，锟斤拷锟节达拷锟斤拷锟斤拷要锟斤拷锟斤拷锟斤拷状态锟斤拷Socket锟斤拷锟斤拷锟斤拷锟斤拷每锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷之锟斤拷锟斤拷系统锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟介，锟斤拷锟斤拷锟斤拷锟斤拷锟饺较凤拷锟姐；锟截憋拷锟角讹拷锟斤拷 socket锟斤拷锟接比较讹拷锟斤拷锟斤拷锟斤拷锟铰ｏ拷锟斤拷一锟斤拷锟教讹拷锟较匡拷锟斤拷锟斤拷锟竭达拷锟斤拷锟斤拷效锟绞ｏ拷锟斤拷一锟斤拷锟斤拷select()锟斤拷锟斤拷锟斤拷同锟斤拷锟斤拷锟斤拷select()锟斤拷锟斤拷之锟斤拷锟斤拷select() 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷socket锟斤拷锟斤拷锟斤拷锟斤拷锟较ｏ拷锟斤拷锟斤拷每锟轿碉拷锟斤拷select()之前锟斤拷锟斤拷锟斤拷锟斤拷socket锟斤拷锟斤拷锟斤拷锟斤拷锟铰硷拷锟诫到锟斤拷锟斤拷锟斤拷锟侥硷拷锟斤拷锟叫ｏ拷锟斤拷 锟剿ｏ拷select()锟斤拷锟斤拷锟绞猴拷锟斤拷只锟斤拷锟斤拷一锟斤拷socket锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷poll()锟斤拷锟斤拷锟绞猴拷锟节达拷锟斤拷socket锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷
-//nfds锟斤拷nfds_t锟斤拷锟酵的诧拷锟斤拷锟斤拷锟斤拷锟节憋拷锟斤拷锟斤拷锟斤拷fds锟叫的结构锟斤拷元锟截碉拷锟斤拷锟斤拷锟斤拷锟斤拷
-//timeout锟斤拷锟斤拷poll锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷时锟戒，锟斤拷位锟斤拷锟斤拷锟诫；
+{//int poll(struct pollfd fds[], nfds_t nfds, int timeout)；
+//参数说明:
+//fds：是一个struct pollfd结构类型的数组，用于存放需要检测其状态的Socket描述符；每当调用这个函数之后，系统不会清空这个数组，操作起来比较方便；特别是对于 socket连接比较多的情况下，在一定程度上可以提高处理的效率；这一点与select()函数不同，调用select()函数之后，select() 函数会清空它所检测的socket描述符集合，导致每次调用select()之前都必须把socket描述符重新加入到待检测的集合中；因 此，select()函数适合于只检测一个socket描述符的情况，而poll()函数适合于大量socket描述符的情况；
+//nfds：nfds_t类型的参数，用于标记数组fds中的结构体元素的总数量；
+//timeout：是poll函数调用阻塞的时间，单位：毫秒；
 
-    int ret = poll(&m_events_c,  1, 10000);  //锟缴癸拷时锟斤拷poll()锟斤拷锟截结构锟斤拷锟斤拷revents锟斤拷锟斤拷为0锟斤拷锟侥硷拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟节筹拷时前没锟斤拷锟轿猴拷锟铰硷拷锟斤拷锟斤拷锟斤拷poll()锟斤拷锟斤拷0锟斤拷失锟斤拷时锟斤拷poll()锟斤拷锟斤拷-1锟斤拷锟斤拷锟斤拷锟斤拷errno为锟斤拷锟斤拷值之一锟斤拷
+    int ret = poll(&m_events_c,  1, 10000);  //成功时，poll()返回结构体中revents域不为0的文件描述符个数；如果在超时前没有任何事件发生，poll()返回0；失败时，poll()返回-1，并设置errno为下列值之一：
     if (ret > 0) {
         return true;
     }
@@ -729,7 +745,7 @@ static void decodeYUV420SP(unsigned int* rgbBuf, unsigned char* yuv420sp, int wi
 
 bool TVideo::FetchPicture()
 {
-	struct v4l2_buffer b;//b 锟斤拷锟斤拷锟斤拷锟斤拷
+	struct v4l2_buffer b;//b 里面存放
 	memset(&b, 0, sizeof b);
 	b.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	b.memory = V4L2_MEMORY_MMAP;
@@ -740,17 +756,17 @@ bool TVideo::FetchPicture()
 	}
 
     
-    void *data_ = captureBuffer[b.index].data; //captuerBuffer只锟斤拷锟斤拷锟斤拷锟斤拷也锟斤拷锟斤拷说一锟斤拷锟斤拷锟斤拷一锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟叫伙拷锟斤拷frameBuffer锟矫ｏ拷锟斤拷锟斤拷锟节达拷锟斤拷锟斤拷锟矫达拷锟斤拷应锟矫伙拷没锟斤拷
+    void *data_ = captureBuffer[b.index].data; //captuerBuffer只有两个，也就是说一个主，一个副，轮流切换，frameBuffer用？从现在代码的用处看应该还没到
     unsigned int len = b.bytesused;
     unsigned int index = b.index;
     //wo zi ji shi yi fa
-    FILE *file_fd;//yeshiwoxiede 
-    file_fd = fopen("test-mmap.yuv", "a+");//图片锟侥硷拷锟斤拷
-    unsigned char* data = (unsigned char*) data_; //锟斤拷锟斤拷锟斤拷应锟斤拷锟角帮拷原始锟斤拷锟捷放碉拷锟斤拷data锟斤拷锟斤拷
-	fwrite(data, Width*Height*3/2, 1, file_fd); //锟斤拷锟斤拷写锟斤拷锟侥硷拷锟斤拷,锟斤拷转锟斤拷之前写锟斤拷去
-    decodeYUV420SP((unsigned int*)Addr, data, Width, Height);//锟斤拷锟斤拷锟斤拷转锟斤拷锟斤拷 
-	toH264(data);//锟斤拷锟斤拷锟斤拷转锟斤拷h264
-    fclose(file_fd);//wo xie de 
+//    FILE *file_fd;//yeshiwoxiede 
+//    file_fd = fopen("test-mmap.yuv", "a+");//图片文件名
+    unsigned char* data = (unsigned char*) data_; //看起来应该是把原始数据放到了data里面
+//	fwrite(data, Width*Height*3/2, 1, file_fd); //将其写入文件中,在转码之前写进去
+    decodeYUV420SP((unsigned int*)Addr, data, Width, Height);//在这里转换了 
+	toH264(data);//在这里转成h264
+//    fclose(file_fd);//wo xie de 
    // fprintf(stderr, "save yuyv file ok\n");
 
 	if (ioctl (fd, VIDIOC_QBUF, &b) < 0) {
@@ -768,10 +784,10 @@ int main(int argc, char **argv)
 		TFrameBuffer FrameBuffer;
 		TVideo Video;
 		initRTP();
-        while(Video.IsValid()) {//锟斤拷锟斤拷锟斤拷锟矫ｏ拷锟斤拷锟斤拷循锟斤拷n
-            if (Video.WaitPic()) {//锟饺达拷取图片
-                if (Video.FetchPicture()) {//锟斤拷锟斤拷取锟斤拷
-                    FrameBuffer.DrawRect(Video);//锟斤拷示锟节碉拷片锟斤拷锟斤拷
+        while(Video.IsValid()) {//如果可用，进入循环n
+            if (Video.WaitPic()) {//等待取图片
+                if (Video.FetchPicture()) {//如果取到
+                    FrameBuffer.DrawRect(Video);//显示在单片机上
                 }
             }
         }
@@ -782,3 +798,4 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+
