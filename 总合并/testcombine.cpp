@@ -50,8 +50,8 @@ public:
 	}
 	virtual ~TRect() {
 	}
-	bool DrawRect(const TRect bitand SrcRect, int x, int y) const { //bitand �൱�� & ����ʵ��
-		if (BPP not_eq 32 or SrcRect.BPP not_eq 32) {//����ǰ�������ù����п�������X������ʹ�ö���ɫ�����ȣ���8bpp�� 16bpp��24bpp��32bpp��һ������ɫ������Խ�������ܱ��ֵ�ɫ��Խ�ḻ���� 24bpp�ͱ���Ϊ����ɫ������ʵ�ı���ͼ����ɫ�ʣ�32bppʵ��Ҳֻ��24bpp�� ����Ϊ����ÿ�����ض�ռ�ݶ�����32λ˫�֣��Զ������ر߽磬���ٴ����ٶȣ� 
+	bool DrawRect(const TRect bitand SrcRect, int x, int y) const { //bitand 相当于 & 传的实参
+		if (BPP not_eq 32 or SrcRect.BPP not_eq 32) {//　在前面的设置过程中可以设置X服务器使用多种色彩深度，如8bpp、 16bpp、24bpp和32bpp，一般来讲色彩深度越大，所能表现的色彩越丰富，而 24bpp就被称为真彩色，能真实的表现图象的色彩（32bpp实际也只是24bpp， 它是为了让每个象素都占据独立的32位双字，以对齐象素边界，加速处理速度） 
 			// don't support that yet
 			throw TError("does not support other than 32 BPP yet");
 		}
@@ -92,8 +92,8 @@ public:
 		unsigned char *DstPtr = Addr + LineLen * y0 + x0 * BPP / 8;
 		const unsigned char *SrcPtr = SrcRect.Addr + SrcRect.LineLen *(y0 - y) + (x0 - x) * SrcRect.BPP / 8;
 
-		for (int i = y0; i <= y1; i++) {//FrameByffer��Addr������Ļ��ӳ����ַ
-			memcpy(DstPtr, SrcPtr, copyLineLen); //memcpy�����Ĺ����Ǵ�Դsrc��ָ���ڴ���ַ����ʼλ�ÿ�ʼ����n���ֽڵ�Ŀ��dest��ָ���ڴ���ַ����ʼλ���С�
+		for (int i = y0; i <= y1; i++) {//FrameByffer的Addr就是屏幕的映射地址
+			memcpy(DstPtr, SrcPtr, copyLineLen); //memcpy函数的功能是从源src所指的内存地址的起始位置开始拷贝n个字节到目标dest所指的内存地址的起始位置中。
 			DstPtr += LineLen;
 			SrcPtr += SrcRect.LineLen;
 		}
@@ -103,7 +103,7 @@ public:
 	}
 
 	bool DrawRect(const TRect bitand rect) const { // default is Center
-		return DrawRect(rect, (Width - rect.Width) / 2, (Height - rect.Height) / 2);//����һ������
+		return DrawRect(rect, (Width - rect.Width) / 2, (Height - rect.Height) / 2);//计算一下中心
 	}
 
 	bool Clear() const {
@@ -130,7 +130,7 @@ protected:
 
 class TFrameBuffer: public TRect {
 public:
-	TFrameBuffer(const char *DeviceName = "/dev/fb0"): TRect(), fd(-1) {// ���Ƕ���Ļ�Ķ�д�Ϳ���ת���ɶ�/dev/fb0,�����Ƕ���Ļ�Ĳ�����
+	TFrameBuffer(const char *DeviceName = "/dev/fb0"): TRect(), fd(-1) {// 我们对屏幕的读写就可以转换成对/dev/fb0,这里是对屏幕的操作，
 		Addr = (unsigned char *)MAP_FAILED;
 
         fd = open(DeviceName, O_RDWR);
@@ -155,10 +155,10 @@ public:
         	LineLen = Fix.line_length;
       		Size = LineLen * Height;
 
-		int PageSize = getpagesize();    //ʹ��getpagesize��������һҳ�ڴ���С
+		int PageSize = getpagesize();    //使用getpagesize函数获得一页内存大小
 		Size = (Size + PageSize - 1) / PageSize * PageSize ;
-	        Addr = (unsigned char *)mmap(NULL, Size, PROT_READ|PROT_WRITE,MAP_SHARED, fd, 0);//ӳ����Ļ������ַ
-		if (Addr == (unsigned char *)MAP_FAILED) {//�������ޱ仯��Ȼ����ʧ����
+	        Addr = (unsigned char *)mmap(NULL, Size, PROT_READ|PROT_WRITE,MAP_SHARED, fd, 0);//映射屏幕操作地址
+		if (Addr == (unsigned char *)MAP_FAILED) {//如果毫无变化当然就是失败了
 			throw TError("map frame buffer failed");
 			return;
 		}
@@ -228,7 +228,7 @@ protected:
 	
 };
 
-//��yuv420ת��h264 ��ʽ
+//将yuv420转成h264 格式
 int TVideo::toH264(unsigned char* yuv420sp)
 {
 		unsigned int buf_type = NO_CACHE;
@@ -250,7 +250,7 @@ int TVideo::toH264(unsigned char* yuv420sp)
 		int retv = 0;
 		//test.nv12
 		/*
-		fp_nv12 = fopen("hello.yuv","rb");  //���ܴ��ļ������ˣ�����Ҫ��һ�¿ɲ����ԣ�������������������NV12
+		fp_nv12 = fopen("hello.yuv","rb");  //不能从文件打开了，不过要试一下可不可以，恩，不过这里好像是NV12
 		if(fp_nv12==NULL) {
 			fprintf(stderr,"Error: open test.nv12\n");
 			retv = 1;
@@ -371,8 +371,8 @@ int TVideo::toH264(unsigned char* yuv420sp)
 			return retv;
 		}else {
 			//printf("SsbSipMfcEncGetOutBuf suceeded\n");
-//			printf("�������˸�noth263ͷ\n");
-			fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
+//			printf("进来加了个noth263头\n");
+			//fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
 			addHead(oinfo);
 		}
 	#endif
@@ -383,7 +383,7 @@ int TVideo::toH264(unsigned char* yuv420sp)
 			return retv;
 		}else {
 			//printf("SsbSipMfcEncGetOutBuf suceeded\n");
-			fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
+			//fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
 //			fprintf(stderr,"headerSize %d\n",oinfo.headerSize);
 			
 		}
@@ -402,19 +402,19 @@ int TVideo::toH264(unsigned char* yuv420sp)
 		int h=param->SourceHeight;
 		//int frmcnt = 0;
 		//size_t fread ( void *buffer, size_t size, size_t count, FILE *stream) ;
-		//�� ��
+		//参 数
 		//buffer
-		//���ڽ������ݵ��ڴ���ַ
+		//用于接收数据的内存地址
 		//size
-		//Ҫ����ÿ�����������ֽ�������λ���ֽ�
+		//要读的每个数据项的字节数，单位是字节
 		//count
-		//Ҫ��count�������ÿ��������size���ֽ�.
+		//要读count个数据项，每个数据项size个字节.
 		//stream
-		//������
-		//��fp_nv12����д��linfo.YVirAddr�У�2����
-		//����ֵ
-		//ʵ�ʶ�ȡ��Ԫ�ظ�������������ֵ��count����ͬ���������ļ���β���������󡣴�ferror��feof��ȡ������Ϣ�������Ƿ񵽴��ļ���β����
-		//if(fread(iinfo.YVirAddr,1,w*h,fp_nv12)==w*h && fread(iinfo.CVirAddr,1,w*h/2,fp_nv12)==w*h/2) {//��ȡ�ļ��е�NV12���ݣ�Ҫ�޸�Ϊ�ոյõ��ģ���Ϊÿ�ζ�Ҫ�Լ�wait��Ӧ�ò���ѭ��
+		//输入流
+		//从fp_nv12读，写到linfo.YVirAddr中，2进制
+		//返回值
+		//实际读取的元素个数。如果返回值与count不相同，则可能文件结尾或发生错误。从ferror和feof获取错误信息或检测是否到达文件结尾。　
+		//if(fread(iinfo.YVirAddr,1,w*h,fp_nv12)==w*h && fread(iinfo.CVirAddr,1,w*h/2,fp_nv12)==w*h/2) {//读取文件中的NV12数据，要修改为刚刚得到的，因为每次都要自己wait，应该不用循环
 		memcpy(iinfo.YVirAddr,yuv420sp,w*h);
 		memcpy(iinfo.CVirAddr,yuv420sp+w*h,w*h/2);
 			err = SsbSipMfcEncSetInBuf(openHandle,&iinfo);
@@ -446,7 +446,7 @@ int TVideo::toH264(unsigned char* yuv420sp)
 				return retv;
 			}
 			
-			fwrite(oinfo.StrmVirAddr,1,oinfo.dataSize,fp_strm);
+			//fwrite(oinfo.StrmVirAddr,1,oinfo.dataSize,fp_strm);
 			toRTP(oinfo);  
 			//printf("oinfo.StrmVirAddr=0x%x, oinfo.dataSize=%d.\n",(unsigned)oinfo.StrmVirAddr,oinfo.dataSize);
 			//printf("Frame # %d encoded\n", frmcnt++);
@@ -485,7 +485,7 @@ void TVideo::OpenDevice()
 		return;
 	}
 	fprintf(stderr, "start test\n");
-			//����֧�ֵķֱ���,��������ͷ���񲢲�����������
+			//测试支持的分辨率,这个摄像头好像并不能输出他们
 		enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		struct v4l2_fmtdesc fmt2;
 		struct v4l2_frmsizeenum frmsize;
@@ -608,7 +608,7 @@ void TVideo::OpenDevice()
     		fprintf(stderr, "unable to map capture buffer\n");
     		return;
     	}
-        //ֱ�Ӵ�����������ͼƬ��һ����ʲô���ӣ�ÿ��ִ��ָ������һ��ImageSize.
+        //直接从这里输出的图片看一看长什么样子，每次执行指挥输出一次ImageSize.
         fprintf(stderr, "ImageSize[%d] = %ld\n", i, b.length);
     }
 
@@ -627,7 +627,7 @@ void TVideo::OpenDevice()
 
     memset(&m_events_c, 0, sizeof(m_events_c));
     m_events_c.fd = fd;
-    m_events_c.events = POLLIN | POLLERR;  //���� �� �� �쳣�¼�
+    m_events_c.events = POLLIN | POLLERR;  //监听 读 和 异常事件
     
 	return;
 }
@@ -673,19 +673,19 @@ void TVideo::StopStream()
 }
 
 bool TVideo::WaitPic()
-{//int poll(struct pollfd fds[], nfds_t nfds, int timeout)��
-//����˵��:
-//fds����һ��struct pollfd�ṹ���͵����飬���ڴ�����Ҫ������״̬��Socket��������ÿ��������������֮����ϵͳ���������������飬���������ȽϷ��㣻�ر��Ƕ��� socket���ӱȽ϶��������£���һ���̶��Ͽ������ߴ�����Ч�ʣ���һ����select()������ͬ������select()����֮����select() ��������������������socket���������ϣ�����ÿ�ε���select()֮ǰ��������socket���������¼��뵽�������ļ����У��� �ˣ�select()�����ʺ���ֻ����һ��socket����������������poll()�����ʺ��ڴ���socket��������������
-//nfds��nfds_t���͵Ĳ��������ڱ�������fds�еĽṹ��Ԫ�ص���������
-//timeout����poll��������������ʱ�䣬��λ�����룻
+{//int poll(struct pollfd fds[], nfds_t nfds, int timeout)；
+//参数说明:
+//fds：是一个struct pollfd结构类型的数组，用于存放需要检测其状态的Socket描述符；每当调用这个函数之后，系统不会清空这个数组，操作起来比较方便；特别是对于 socket连接比较多的情况下，在一定程度上可以提高处理的效率；这一点与select()函数不同，调用select()函数之后，select() 函数会清空它所检测的socket描述符集合，导致每次调用select()之前都必须把socket描述符重新加入到待检测的集合中；因 此，select()函数适合于只检测一个socket描述符的情况，而poll()函数适合于大量socket描述符的情况；
+//nfds：nfds_t类型的参数，用于标记数组fds中的结构体元素的总数量；
+//timeout：是poll函数调用阻塞的时间，单位：毫秒；
 
-    int ret = poll(&m_events_c,  1, 10000);  //�ɹ�ʱ��poll()���ؽṹ����revents����Ϊ0���ļ������������������ڳ�ʱǰû���κ��¼�������poll()����0��ʧ��ʱ��poll()����-1��������errnoΪ����ֵ֮һ��
+    int ret = poll(&m_events_c,  1, 10000);  //成功时，poll()返回结构体中revents域不为0的文件描述符个数；如果在超时前没有任何事件发生，poll()返回0；失败时，poll()返回-1，并设置errno为下列值之一：
     if (ret > 0) {
         return true;
     }
     return false;
 }
-//yuvתrgb
+//yuv转rgb
 static void decodeYUV420SP(unsigned int* rgbBuf, unsigned char* yuv420sp, int width, int height) {  
     int frameSize = width * height;  
 
@@ -729,7 +729,7 @@ static void decodeYUV420SP(unsigned int* rgbBuf, unsigned char* yuv420sp, int wi
 
 bool TVideo::FetchPicture()
 {
-	struct v4l2_buffer b;//b ��������
+	struct v4l2_buffer b;//b 里面存放
 	memset(&b, 0, sizeof b);
 	b.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	b.memory = V4L2_MEMORY_MMAP;
@@ -740,17 +740,17 @@ bool TVideo::FetchPicture()
 	}
 
     
-    void *data_ = captureBuffer[b.index].data; //captuerBufferֻ��������Ҳ����˵һ������һ�����������л���frameBuffer�ã������ڴ������ô���Ӧ�û�û��
+    void *data_ = captureBuffer[b.index].data; //captuerBuffer只有两个，也就是说一个主，一个副，轮流切换，frameBuffer用？从现在代码的用处看应该还没到
     unsigned int len = b.bytesused;
     unsigned int index = b.index;
     //wo zi ji shi yi fa
-    FILE *file_fd;//yeshiwoxiede 
-    file_fd = fopen("test-mmap.yuv", "a+");//ͼƬ�ļ���
-    unsigned char* data = (unsigned char*) data_; //������Ӧ���ǰ�ԭʼ���ݷŵ���data����
-	fwrite(data, Width*Height*3/2, 1, file_fd); //����д���ļ���,��ת��֮ǰд��ȥ
-    decodeYUV420SP((unsigned int*)Addr, data, Width, Height);//������ת���� 
-	toH264(data);//������ת��h264
-    fclose(file_fd);//wo xie de 
+    //FILE *file_fd;//yeshiwoxiede 
+    //file_fd = fopen("test-mmap.yuv", "a+");//图片文件名
+    unsigned char* data = (unsigned char*) data_; //看起来应该是把原始数据放到了data里面
+	//fwrite(data, Width*Height*3/2, 1, file_fd); //将其写入文件中,在转码之前写进去
+    decodeYUV420SP((unsigned int*)Addr, data, Width, Height);//在这里转换了 
+	toH264(data);//在这里转成h264
+    //fclose(file_fd);//wo xie de 
    // fprintf(stderr, "save yuyv file ok\n");
 
 	if (ioctl (fd, VIDIOC_QBUF, &b) < 0) {
@@ -768,10 +768,10 @@ int main(int argc, char **argv)
 		TFrameBuffer FrameBuffer;
 		TVideo Video;
 		initRTP();
-        while(Video.IsValid()) {//�������ã�����ѭ��n
-            if (Video.WaitPic()) {//�ȴ�ȡͼƬ
-                if (Video.FetchPicture()) {//����ȡ��
-                    FrameBuffer.DrawRect(Video);//��ʾ�ڵ�Ƭ����
+        while(Video.IsValid()) {//如果可用，进入循环n
+            if (Video.WaitPic()) {//等待取图片
+                if (Video.FetchPicture()) {//如果取到
+                    FrameBuffer.DrawRect(Video);//显示在单片机上
                 }
             }
         }

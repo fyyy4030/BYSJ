@@ -64,11 +64,11 @@ bool CRTSPStream::SendH264File(const char *pFileName)
         printf("[RTSPStream] error:open file %s failed!\n",pFileName);  
     }    
     fseek(fp, 0, SEEK_SET);  
-  
+	//一般FILEBUFSIZE大一些
     unsigned char *buffer  = new unsigned char[FILEBUFSIZE];  
     int pos = 0;  
     while(1)  
-    {  
+    {  //一般一次读光
         int readlen = fread(buffer+pos, sizeof(unsigned char), FILEBUFSIZE-pos, fp);  
   
         if(readlen<=0)  
@@ -77,7 +77,7 @@ bool CRTSPStream::SendH264File(const char *pFileName)
         }  
   
         readlen+=pos;  
-  
+		//writeln 始终为0
         int writelen = SendH264Data(buffer,readlen);  
         if(writelen<=0)  
         {  
@@ -86,7 +86,7 @@ bool CRTSPStream::SendH264File(const char *pFileName)
         memcpy(buffer,buffer+writelen,readlen-writelen);  
         pos = readlen-writelen;  
   
-        mSleep(25);  
+        mSleep(17);  
     }  
     fclose(fp);  
     delete[] buffer;  
@@ -100,9 +100,9 @@ int CRTSPStream::SendH264Data(const unsigned char *data,unsigned int size)
     {  
         return 0;  
     }  
-	printf("[RTSPStream] start send Data!\n"); 
+	printf("[RTSPStream] start send Data!hehe\n"); 
     // open pipe with non_block mode  
-    int pipe_fd = open(FIFO_NAME, O_WRONLY|O_NONBLOCK);  
+    int pipe_fd = open(FIFO_NAME, O_WRONLY);  
     printf("[RTSPStream] open fifo result = [%d]\n",pipe_fd);  
     if(pipe_fd == -1)  
     {  
@@ -119,8 +119,9 @@ int CRTSPStream::SendH264Data(const unsigned char *data,unsigned int size)
         if(len == -1)  
         {  
             static int resend_conut = 0;  
-            if(errno == EAGAIN && ++resend_conut<=3)  
+            if(errno == EAGAIN && ++resend_conut<=30)  
             {  
+				//usleep(1000);//n毫秒
                 printf("[RTSPStream] write fifo error,resend..\n");  
                 continue;  
             }  

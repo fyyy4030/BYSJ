@@ -15,9 +15,9 @@
 #include <sys/poll.h>
 #include <errno.h>
 
+#include "RTSPStream.h"  
 #include "mfc_interface.h"
 #include "SsbSipMfcApi.h"
-#include "rtp.h"
 #define TEST_H264
 //#define TEST_H263
 
@@ -245,6 +245,8 @@ protected:
 		
 		FILE *fp_nv12, *fp_strm;
 	int retv;
+	//live555
+	CRTSPStream rtspSender;
 };
 
 void TVideo::closeMFC(){
@@ -257,7 +259,8 @@ void TVideo::closeMFC(){
 
 int TVideo::initMFC(){
 		unsigned int buf_type = NO_CACHE;
-
+		//live555 管道传输
+		bool bRet = rtspSender.Init();  
 		retv = 0;
 
 		
@@ -377,7 +380,7 @@ int TVideo::initMFC(){
 			//printf("SsbSipMfcEncGetOutBuf suceeded\n");
 //			printf("进来加了个noth263头\n");
 			fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
-			addHead(oinfo);
+//			addHead(oinfo);
 		}
 	#endif
 		err = SsbSipMfcEncGetOutBuf(openHandle,&oinfo);
@@ -470,8 +473,10 @@ int TVideo::toH264(unsigned char* yuv420sp)
 			}
 			
 			fwrite(oinfo.StrmVirAddr,1,oinfo.dataSize,fp_strm);
-	
-			toRTP(oinfo);  
+			unsigned char *buffer  = new unsigned char[oinfo.dataSize]; 
+			memcpy(buffer,oinfo.StrmVirAddr,oinfo.dataSize);
+			rtspSender.SendH264Data(buffer,oinfo.dataSize);  
+			//toRTP(oinfo);  
 			//printf("oinfo.StrmVirAddr=0x%x, oinfo.dataSize=%d.\n",(unsigned)oinfo.StrmVirAddr,oinfo.dataSize);
 			//printf("Frame # %d encoded\n", frmcnt++);
 		
@@ -783,7 +788,7 @@ int main(int argc, char **argv)
 	try {
 		TFrameBuffer FrameBuffer;
 		TVideo Video;
-		initRTP();
+	//	initRTP();
         while(Video.IsValid()) {//如果可用，进入循环n
             if (Video.WaitPic()) {//等待取图片
                 if (Video.FetchPicture()) {//如果取到
