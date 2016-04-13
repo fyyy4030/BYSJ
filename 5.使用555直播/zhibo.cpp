@@ -14,6 +14,7 @@
 #include <linux/videodev2.h>
 #include <sys/poll.h>
 #include <errno.h>
+#include <time.h>
 
 #include "RTSPStream.h" 
 #include "mfc_interface.h"
@@ -382,7 +383,7 @@ int TVideo::toH264(unsigned char* yuv420sp)
 //			printf("进来加了个noth263头\n");
 			headbuffer  = new unsigned char[oinfo.headerSize];
 			memcpy(headbuffer,oinfo.StrmVirAddr,oinfo.headerSize);
-			fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
+			//fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
 			//addHead(oinfo);
 		}
 	#endif
@@ -393,7 +394,7 @@ int TVideo::toH264(unsigned char* yuv420sp)
 			return retv;
 		}else {
 			//printf("SsbSipMfcEncGetOutBuf suceeded\n");
-			fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
+			//fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
 //			fprintf(stderr,"headerSize %d\n",oinfo.headerSize);
 			
 		}
@@ -459,7 +460,15 @@ int TVideo::toH264(unsigned char* yuv420sp)
 			buffer  = new unsigned char[oinfo.headerSize+oinfo.dataSize];
 			memcpy(buffer,headbuffer,oinfo.headerSize);
 			memcpy(buffer+oinfo.headerSize,oinfo.StrmVirAddr,oinfo.dataSize);
+			
+			time_t timep;
+			time (&timep);
+			printf("时间：%s\n",ctime(&timep));
+			string str=ctime(&timep);
+			fwrite(str,strlen(str),1,fp_strm);
+			
 			rtspSender.SendH264Data(buffer,oinfo.dataSize);  
+			
 			//fwrite(oinfo.StrmVirAddr,1,oinfo.dataSize,fp_strm);
 			delete[] buffer;
 			delete[] headbuffer;

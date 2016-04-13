@@ -102,7 +102,7 @@ int CRTSPStream::SendH264Data(const unsigned char *data,unsigned int size)
     }  
 	printf("[RTSPStream] start send Data!hehe\n"); 
     // open pipe with non_block mode  
-    int pipe_fd = open(FIFO_NAME, O_WRONLY);  
+    int pipe_fd = open(FIFO_NAME, O_WRONLY|O_NONBLOCK);  
     printf("[RTSPStream] open fifo result = [%d]\n",pipe_fd);  
     if(pipe_fd == -1)  
     {  
@@ -119,7 +119,7 @@ int CRTSPStream::SendH264Data(const unsigned char *data,unsigned int size)
         if(len == -1)  
         {  
             static int resend_conut = 0;  
-            if(errno == EAGAIN && ++resend_conut<=30)  
+            if(errno == EAGAIN && ++resend_conut<=300)  
             {  
 				//usleep(1000);//n毫秒
                 printf("[RTSPStream] write fifo error,resend..\n");  
