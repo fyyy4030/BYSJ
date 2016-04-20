@@ -589,6 +589,10 @@ void TVideo::OpenDevice()
         fprintf(stderr, "could not set frame rate\n");
 	} else {
 		CouldSetFrameRate = StreamParam.parm.capture.capability & V4L2_CAP_TIMEPERFRAME;
+		printf("\n  Frame rate:   %u/%u\n",
+               setfps->parm.capture.timeperframe.denominator,
+               setfps->parm.capture.timeperframe.numerator
+               );
 	}
 
     // map the capture buffer...
@@ -774,7 +778,7 @@ bool TVideo::FetchPicture()
 //    fclose(file_fd);//wo xie de 
    // fprintf(stderr, "save yuyv file ok\n");
 
-	if (ioctl (fd, VIDIOC_QBUF, &b) < 0) {
+	if (ioctl (fd, VIDIOC_QBUF, &b) < 0) {//投放一个空的视频缓冲区到视频缓冲区输入队列中 ；
         Valid = false;
 		fprintf(stderr, "cannot fetch picture(VIDIOC_QBUF failed)\n");
 		return false;

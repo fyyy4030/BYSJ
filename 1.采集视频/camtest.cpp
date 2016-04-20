@@ -13,6 +13,7 @@
 #include <linux/fb.h>
 #include <linux/videodev2.h>
 #include <sys/poll.h>
+#include <sys/time.h>
 #include "videodev2_samsung.h"
 
 #define CAMERA_DEV_NAME   "/dev/video0"
@@ -515,13 +516,20 @@ bool TVideo::FetchPicture()
 
 int main(int argc, char **argv)
 {
+	struct timeval tpstart,tpend,temp;
+	float timeuse;
 	try {
 		TFrameBuffer FrameBuffer;
 		TVideo Video;
 		
         while(Video.IsValid()) {//如果可用，进入循环
             if (Video.WaitPic()) {//等待取图片
+						gettimeofday(&tpstart,0);
                 if (Video.FetchPicture()) {//如果取到
+								gettimeofday(&tpend,0);
+				timeuse = 1000000*(tpend.tv_sec-tpstart.tv_sec) + (tpend.tv_usec-tpstart.tv_usec);
+				timeuse /= 1000000;
+				printf("select used time:%f\n",timeuse);
                     FrameBuffer.DrawRect(Video);//显示在单片机上
                 }
             }

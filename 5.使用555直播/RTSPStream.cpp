@@ -15,7 +15,8 @@ purpose:    通过live555实现H264 RTSP直播
 #include <limits.h>  
 #include <errno.h>  
 #endif  
-  
+ 
+#define DEBUG false
 #define FIFO_NAME    "/tmp/H264_fifo"  
 #define BUFFERSIZE   PIPE_BUF  
   
@@ -100,10 +101,12 @@ int CRTSPStream::SendH264Data(const unsigned char *data,unsigned int size)
     {  
         return 0;  
     }  
-	printf("[RTSPStream] start send Data!hehe\n"); 
+	//printf("[RTSPStream] start send Data!hehe\n"); 
     // open pipe with non_block mode  
     int pipe_fd = open(FIFO_NAME, O_WRONLY|O_NONBLOCK);  
-    printf("[RTSPStream] open fifo result = [%d]\n",pipe_fd);  
+	if(DEBUG){
+		printf("[RTSPStream] open fifo result = [%d]\n",pipe_fd); 
+	}		
     if(pipe_fd == -1)  
     {  
 		printf("[RTSPStream] pipe error in send!\n"); 
@@ -136,6 +139,8 @@ int CRTSPStream::SendH264Data(const unsigned char *data,unsigned int size)
         }  
     }  
     close(pipe_fd);  
-    printf("[RTSPStream] SendH264Data datalen[%d], sendsize = [%d]\n",size,send_size);  
+	if(DEBUG){
+		printf("[RTSPStream] SendH264Data datalen[%d], sendsize = [%d]\n",size,send_size);  
+	}
     return 0;  
 }  

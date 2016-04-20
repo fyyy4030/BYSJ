@@ -13,16 +13,7 @@
 #include <linux/fb.h>
 #include <linux/videodev2.h>
 #include <sys/poll.h>
-#include <errno.h>
-#include <time.h>
-
-#include "RTSPStream.h" 
-#include "mfc_interface.h"
-#include "SsbSipMfcApi.h"
-#define TEST_H264
-#define DEBUG false
-//#define TEST_H263
-
+#include <sys/time.h>
 #include "videodev2_samsung.h"
 
 #define CAMERA_DEV_NAME   "/dev/video0"
@@ -202,11 +193,9 @@ public:
         StartStream();
 	}
     
-	void initLive555();
     bool IsValid() const { return Valid; }
     bool WaitPic();
 	bool FetchPicture();
-	int toH264(unsigned char* yuv420sp);
 
 	virtual ~TVideo() {
 		::close(fd);
@@ -221,274 +210,14 @@ protected:
     void OpenDevice();
     void StartStream();
     void StopStream();
-	
+
 	int fd;
     bool Valid;
     struct pollfd  m_events_c;
 	static const int CAPTURE_BUFFER_NUMBER = 1;
 	struct { void * data; int len; } captureBuffer[CAPTURE_BUFFER_NUMBER];
-	//live555
-	CRTSPStream rtspSender;
 	
 };
-
-void TVideo::initLive555(){
-	bool bRet = rtspSender.Init();  
-}
-
-//将yuv420转成h264 格式
-int TVideo::toH264(unsigned char* yuv420sp)
-{
-	unsigned char *headbuffer;
-	unsigned char *buffer;
-		unsigned int buf_type = NO_CACHE;
-		void *openHandle;
-	#if defined TEST_H264
-		SSBSIP_MFC_ENC_H264_PARAM *param;
-	#elif defined TEST_H263
-		SSBSIP_MFC_ENC_H263_PARAM *param;
-	#else
-		SSBSIP_MFC_ENC_MPEG4_PARAM *param;
-	#endif
-		
-		SSBSIP_MFC_ERROR_CODE err;
-		SSBSIP_MFC_ENC_INPUT_INFO iinfo;
-		SSBSIP_MFC_ENC_OUTPUT_INFO oinfo;
-		
-		FILE *fp_nv12, *fp_strm;
-		
-		int retv = 0;
-		//test.nv12
-		/*
-		fp_nv12 = fopen("hello.yuv","rb");  //不能从文件打开了，不过要试一下可不可以，恩，不过这里好像是NV12
-		if(fp_nv12==NULL) {
-			fprintf(stderr,"Error: open test.nv12\n");
-			retv = 1;
-			goto exit_end;
-		}
-		*/	
-	#if defined TEST_H264
-		fp_strm = fopen("test2.h264","a+");
-	#elif defined TEST_H263
-		fp_strm = fopen("test.h263","wb");
-	#else
-		fp_strm = fopen("test.mpeg4","wb");
-	#endif
-		if(fp_strm==NULL) {
-			fprintf(stderr,"Error: open output file\n");
-			retv = 1;
-			return 0;
-		}
-		
-		
-		openHandle = SsbSipMfcEncOpen(&buf_type);
-		if(openHandle == NULL) {
-			fprintf(stderr,"Error: SsbSipMfcEncOpen\n");
-			retv = 1;
-			return -1;
-		}else {
-		//	printf("MfcEncOpen succeeded\n");
-		}
-		
-		param=(SSBSIP_MFC_ENC_H264_PARAM*)malloc(sizeof(SSBSIP_MFC_ENC_H264_PARAM));
-		if(param==NULL) {
-			fprintf(stderr,"Error: malloc param\n");
-			retv = 1;
-					err = SsbSipMfcEncClose(openHandle);
-					if(err<0) {
-					fprintf(stderr,"Error: SsbSipMfcEncClose. Code %d\n",err);		
-			}
-			return -1;
-		}
-		memset(param,0,sizeof(*param));
-		
-		//common parameters
-	#if defined TEST_H264
-		param->codecType = H264_ENC;
-	#elif defined TEST_H263
-		param->codecType = H263_ENC;
-	#else
-		param->codecType = MPEG4_ENC;
-	#endif
-		param->SourceWidth = 640;
-		param->SourceHeight = 480;
-		param->IDRPeriod = 100;
-		param->SliceMode = 0; // 0,1,2,4
-		param->RandomIntraMBRefresh = 0;
-		param->EnableFRMRateControl = 1; // this must be 1 otherwise init error
-		param->Bitrate = 128000;
-		param->FrameQp = 20; //<=51, the bigger the lower quality
-		param->FrameQp_P = 20;
-		param->QSCodeMin = 10; // <=51
-		param->QSCodeMax = 51; // <=51
-		param->CBRPeriodRf = 120;
-		param->PadControlOn = 0;
-		param->LumaPadVal = 0; // <=255
-		param->CbPadVal = 0; //<=255
-		param->CrPadVal = 0; //<=255
-		param->FrameMap = 0; // encoding input mode (0=linear, 1=tiled) 
-		
-	#if defined TEST_H264
-		// H264 specific
-		param->ProfileIDC = 1; // 0=main,1=high,2=baseline
-		param->LevelIDC = 40; // level 4.0
-		param->FrameQp_B = 20;
-		param->FrameRate = 30000; // real frame rate = FrameRate/1000 (refer to S5PV210 datasheet Section 6.3.4.2.2)
-		param->SliceArgument = 0;
-		param->NumberBFrames = 0; //<=2
-		param->NumberReferenceFrames = 2; // <=2
-		param->NumberRefForPframes = 2; // <=2
-		param->LoopFilterDisable = 1; // 0=enable, 1=disable
-		param->LoopFilterAlphaC0Offset = 0; // <=6
-		param->LoopFilterBetaOffset = 0; // <=6
-		param->SymbolMode = 1; // 0=CAVLC, 1=CABAC
-		param->PictureInterlace = 0; // Picture AFF 0=frame coding, 1=field coding, 2=adaptive
-		param->Transform8x8Mode = 1; // 0=only 4x4 transform, 1=allow 8x8 trans, 2=only 8x8 trans
-		param->EnableMBRateControl = 0;
-		param->DarkDisable = 0;
-		param->SmoothDisable = 0;
-		param->StaticDisable = 0;
-		param->ActivityDisable = 0;
-	#elif defined TEST_H263
-		// H263 specific
-		param->FrameRate = 30000;
-	#else
-		// MPEG4 specific
-		param->ProfileIDC = 0; // 0=main,1=high,2=baseline
-		param->LevelIDC = 40; // level 4.0
-		param->FrameQp_B = 20;
-		param->TimeIncreamentRes = 0;
-		param->VopTimeIncreament = 0;
-		param->SliceArgument = 0;
-		param->NumberBFrames = 0; //<=2
-		param->DisableQpelME = 0;
-	#endif
-		
-		err = SsbSipMfcEncInit(openHandle,param);
-		if(err<0) {
-			fprintf(stderr,"Error: SsbSipMfcEncInit. Code %d\n",err);
-			retv = 1;
-			return retv;
-		}else {
-			//printf("SsbSipMfcEncInit succeeded\n");
-		}
-		
-	#ifndef TEST_H263
-		err = SsbSipMfcEncGetOutBuf(openHandle,&oinfo);
-		if(err<0) {
-			fprintf(stderr,"Error: SsbSipMfcEncGetOutBuf. Code %d\n",err);
-			retv =1;
-			return retv;
-		}else {
-			//printf("SsbSipMfcEncGetOutBuf suceeded\n");
-//			printf("进来加了个noth263头\n");
-			headbuffer  = new unsigned char[oinfo.headerSize];
-			memcpy(headbuffer,oinfo.StrmVirAddr,oinfo.headerSize);
-			//fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
-			//addHead(oinfo);
-		}
-	#endif
-		err = SsbSipMfcEncGetOutBuf(openHandle,&oinfo);
-		if(err<0) {
-			fprintf(stderr,"Error: SsbSipMfcEncGetOutBuf. Code %d\n",err);
-			retv =1;
-			return retv;
-		}else {
-			//printf("SsbSipMfcEncGetOutBuf suceeded\n");
-			//fwrite(oinfo.StrmVirAddr,1,oinfo.headerSize,fp_strm);
-//			fprintf(stderr,"headerSize %d\n",oinfo.headerSize);
-			
-		}
-		memset(&iinfo,0,sizeof(iinfo));
-		err = SsbSipMfcEncGetInBuf(openHandle,&iinfo);
-		if(err<0) {
-			fprintf(stderr,"Error: SsbSipMfcEncGetInBuf. Code %d\n",err);
-			retv = 1;
-			return retv;
-		}else {
-			//printf("SsbSipMfcEncGetInBuf succeeded\n");
-		}
-
-		
-		int w=param->SourceWidth;
-		int h=param->SourceHeight;
-		//int frmcnt = 0;
-		//size_t fread ( void *buffer, size_t size, size_t count, FILE *stream) ;
-		//参 数
-		//buffer
-		//用于接收数据的内存地址
-		//size
-		//要读的每个数据项的字节数，单位是字节
-		//count
-		//要读count个数据项，每个数据项size个字节.
-		//stream
-		//输入流
-		//从fp_nv12读，写到linfo.YVirAddr中，2进制
-		//返回值
-		//实际读取的元素个数。如果返回值与count不相同，则可能文件结尾或发生错误。从ferror和feof获取错误信息或检测是否到达文件结尾。　
-		//if(fread(iinfo.YVirAddr,1,w*h,fp_nv12)==w*h && fread(iinfo.CVirAddr,1,w*h/2,fp_nv12)==w*h/2) {//读取文件中的NV12数据，要修改为刚刚得到的，因为每次都要自己wait，应该不用循环
-		memcpy(iinfo.YVirAddr,yuv420sp,w*h);
-		memcpy(iinfo.CVirAddr,yuv420sp+w*h,w*h/2);
-			err = SsbSipMfcEncSetInBuf(openHandle,&iinfo);
-			if(err<0) {
-				fprintf(stderr,"Error: SsbSipMfcEncSetInBuf. Code %d\n",err);
-				retv = 1;
-				return retv;
-			}
-	#if 0
-			err = SsbSipMfcEncSetOutBuf(openHandle,phyOutbuf,virOutbuf,outbufSize);
-			if(err<0) {
-				fprintf(stderr,"Error: SsbSipMfcEncSetOutBuf. Code %d\n",err);
-				retv = 1;
-				return retv;
-			}
-	#endif
-			err = SsbSipMfcEncExe(openHandle);
-			if(err<0) {
-				fprintf(stderr,"Error: SsbSipMfcEncExe. Code %d\n",err);
-				retv = 1;
-				return retv;
-			}
-			
-			memset(&oinfo,0,sizeof(oinfo));
-			err = SsbSipMfcEncGetOutBuf(openHandle,&oinfo);
-			if(err<0) {
-				fprintf(stderr,"Error: SsbSipMfcEncGetOutBuf. Code %d\n",err);
-				retv = 1;
-				return retv;
-			}
-			
-			buffer  = new unsigned char[oinfo.headerSize+oinfo.dataSize];
-			memcpy(buffer,headbuffer,oinfo.headerSize);
-			memcpy(buffer+oinfo.headerSize,oinfo.StrmVirAddr,oinfo.dataSize);
-			
-			time_t timep;
-			time (&timep);
-			//printf("时间：%s\n",ctime(&timep));
-			
-			rtspSender.SendH264Data(buffer,oinfo.dataSize);  
-			
-			//fwrite(oinfo.StrmVirAddr,1,oinfo.dataSize,fp_strm);
-			delete[] buffer;
-			delete[] headbuffer;
-			//toRTP(oinfo);  
-			//printf("oinfo.StrmVirAddr=0x%x, oinfo.dataSize=%d.\n",(unsigned)oinfo.StrmVirAddr,oinfo.dataSize);
-			//printf("Frame # %d encoded\n", frmcnt++);
-		
-		// clear up
-	exit_param:
-		free(param);
-		err = SsbSipMfcEncClose(openHandle);
-		if(err<0) {
-			fprintf(stderr,"Error: SsbSipMfcEncClose. Code %d\n",err);
-		}
-		
-	fclose(fp_strm);
-		
-	exit_end:
-		return retv;
-
-}
 
 void TVideo::OpenDevice()
 {
@@ -574,7 +303,7 @@ void TVideo::OpenDevice()
     fmt.type                = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     fmt.fmt.pix.width       = Width;
     fmt.fmt.pix.height      = Height;
-    fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_NV12;
+    fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_NV21;
     fmt.fmt.pix.sizeimage = (fmt.fmt.pix.width * fmt.fmt.pix.height * 16) / 8;
     fmt.fmt.pix.field = V4L2_FIELD_NONE;
 
@@ -592,10 +321,6 @@ void TVideo::OpenDevice()
         fprintf(stderr, "could not set frame rate\n");
 	} else {
 		CouldSetFrameRate = StreamParam.parm.capture.capability & V4L2_CAP_TIMEPERFRAME;
-		printf("\n  Frame rate:   %u/%u\n",
-               StreamParam.parm.capture.timeperframe.denominator,
-               StreamParam.parm.capture.timeperframe.numerator
-               );
 	}
 
     // map the capture buffer...
@@ -771,15 +496,11 @@ bool TVideo::FetchPicture()
     void *data_ = captureBuffer[b.index].data; //captuerBuffer只有两个，也就是说一个主，一个副，轮流切换，frameBuffer用？从现在代码的用处看应该还没到
     unsigned int len = b.bytesused;
     unsigned int index = b.index;
-    //wo zi ji shi yi fa
-    //FILE *file_fd;//yeshiwoxiede 
-    //file_fd = fopen("test-mmap.yuv", "a+");//图片文件名
+
     unsigned char* data = (unsigned char*) data_; //看起来应该是把原始数据放到了data里面
-	//fwrite(data, Width*Height*3/2, 1, file_fd); //将其写入文件中,在转码之前写进去
-    //decodeYUV420SP((unsigned int*)Addr, data, Width, Height);//在这里转换了 
-	toH264(data);//在这里转成h264
-    //fclose(file_fd);//wo xie de 
-   // fprintf(stderr, "save yuyv file ok\n");
+
+    decodeYUV420SP((unsigned int*)Addr, data, Width, Height);//在这里转换了 
+
 
 	if (ioctl (fd, VIDIOC_QBUF, &b) < 0) {
         Valid = false;
@@ -795,20 +516,18 @@ int main(int argc, char **argv)
 	struct timeval tpstart,tpend,temp;
 	float timeuse;
 	try {
-		//TFrameBuffer FrameBuffer;
+		TFrameBuffer FrameBuffer;
 		TVideo Video;
-		Video.initLive555();
-        while(Video.IsValid()) {//如果可用，进入循环n
+		
+        while(Video.IsValid()) {//如果可用，进入循环
             if (Video.WaitPic()) {//等待取图片
-			gettimeofday(&tpstart,0);
+						gettimeofday(&tpstart,0);
                 if (Video.FetchPicture()) {//如果取到
-				gettimeofday(&tpend,0);
+								gettimeofday(&tpend,0);
 				timeuse = 1000000*(tpend.tv_sec-tpstart.tv_sec) + (tpend.tv_usec-tpstart.tv_usec);
 				timeuse /= 1000000;
-				if(DEBUG){
-					printf("select used time:%f\n",timeuse);
-				}
-                //    FrameBuffer.DrawRect(Video);//显示在单片机上
+				printf("select used time:%f\n",timeuse);
+                    FrameBuffer.DrawRect(Video);//显示在单片机上
                 }
             }
         }
@@ -819,3 +538,4 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+
